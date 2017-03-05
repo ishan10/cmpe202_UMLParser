@@ -35,8 +35,27 @@ public class ListClassExample {
 		}).explore(projectDir);
 	}
 
-	/*public static void main(String[] args) {
+	public static void listMethodCalls(File projectDir) {
+        new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
+            System.out.println(path);
+            System.out.println(Strings.repeat("=", path.length()));
+            try {
+                new VoidVisitorAdapter<Object>() {
+                    @Override
+                    public void visit(MethodCallExpr n, Object arg) {
+                        super.visit(n, arg);
+                        System.out.println(" [L " + n.getBeginLine() + "] " + n);
+                    }
+                }.visit(JavaParser.parse(file), null);
+                System.out.println(); // empty line
+            } catch (ParseException | IOException e) {
+                new RuntimeException(e);
+            }
+        }).explore(projectDir);
+    }
+
+	public static void main(String[] args) {
 		File projectDir = new File("E:/workspaces/CMPE202/JavaParser/src/com/parser");
-		listClasses(projectDir);
-	}*/
-}
+		//listClasses(projectDir);
+		listMethodCalls(projectDir);
+	}
