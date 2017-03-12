@@ -24,7 +24,7 @@ public class ListClassExample {
 					public void visit(ClassOrInterfaceDeclaration n, Object arg) {
 						super.visit(n, arg);
 						System.out.println(" * " + n.getName());
-						System.out.println(" * " + n.getMembers());
+						//System.out.println(" * " + n.getMembers());
 						
 					}
 				}.visit(JavaParser.parse(file), null);
