@@ -23,8 +23,12 @@ public class ListClassExample {
 					@Override
 					public void visit(ClassOrInterfaceDeclaration n, Object arg) {
 						super.visit(n, arg);
-						System.out.println(" * " + n.getName());
+						//System.out.println(" * " + n.getName());
 						//System.out.println(" * " + n.getMembers());
+						List<BodyDeclaration> bd = n.getMembers();
+						for (int i = 0; i < bd.size(); i++) {
+							System.out.println("BBB: "+bd.get(i));
+						}
 						
 					}
 				}.visit(JavaParser.parse(file), null);
