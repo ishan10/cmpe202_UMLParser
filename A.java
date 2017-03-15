@@ -8,9 +8,9 @@ public class A {
 	 
 	private int[] y;
 	 
-	private Collection<B> b;
+//	private Collection<B> b;
 	 
-	private C c;
+	//private C c;
 	private int num;
 	 
 	private Collection<D> d;
