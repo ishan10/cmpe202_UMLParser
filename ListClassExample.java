@@ -31,11 +31,13 @@ public class ListClassExample {
 					public void visit(ClassOrInterfaceDeclaration n, Object arg) {
 						ParseStructure parseStructure = new ParseStructure();
 						super.visit(n, arg);
+
 						parseStructure.setClassName(n.getName());
 						Map<String,String> privateAttributes = parseStructure.getPrivateClassAttributes();
 						System.out.println(" * " + n.getName());
 					//	System.out.println(" * " + n.getMembers());
 						List<BodyDeclaration> bd = n.getMembers();
+
 						
 						for(BodyDeclaration member: bd){
 							FieldDeclaration field = (FieldDeclaration) member;
@@ -61,6 +63,7 @@ public class ListClassExample {
 
 	public static void main(String[] args) {
 		File projectDir = new File("E:/workspaces/CMPE202/JavaParser/src/com/parser");
+
 		listClasses(projectDir);
 		//listMethodCalls(projectDir);
 	}
