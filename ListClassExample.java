@@ -40,14 +40,13 @@ public class ListClassExample {
 
 						
 						for(BodyDeclaration member: bd){
-							FieldDeclaration field = (FieldDeclaration) member;
-						//	Map<Integer, ArrayList<String>> classAttributes = parseStructure.getClassAttributes();
 							
-							System.out.print(field.getType() + " ");
-							System.out.print(field.getModifiers()+ " ");
-							System.out.println(field.getVariables().get(0).getId().getName());
+							if(member instanceof FieldDeclaration){
+						//	Map<Integer, ArrayList<String>> classAttributes = parseStructure.getClassAttributes();
+								FieldDeclaration field = (FieldDeclaration) member;
 							if( field.getModifiers()==2){
 								privateAttributes.put(field.getType().toString(), field.getVariables().get(0).getId().getName());
+							}
 							}
 						}
 						parseStructure.generateUML(privateAttributes);
