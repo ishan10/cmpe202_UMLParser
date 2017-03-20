@@ -21,7 +21,7 @@ public class ListClassExample {
 
 	
 	
-	public static void listClasses(File projectDir) {
+	public static void listClasses(File projectDir, ParseStructure parseStructure) {
 		new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
 			System.out.println(path);
 			System.out.println(Strings.repeat("=", path.length()));
@@ -29,15 +29,13 @@ public class ListClassExample {
 				new VoidVisitorAdapter<Object>() {
 					@Override
 					public void visit(ClassOrInterfaceDeclaration n, Object arg) {
-						ParseStructure parseStructure = new ParseStructure();
+						
 						super.visit(n, arg);
-
-						parseStructure.setClassName(n.getName());
-						Map<String,String> privateAttributes = parseStructure.getPrivateClassAttributes();
-						System.out.println(" * " + n.getName());
-					//	System.out.println(" * " + n.getMembers());
+						//String className = n.getName();
+						parseStructure.getClassNames().add(n.getName());
+					/*	Map<String,String> privateAttributes = parseStructure.getPrivateClassAttributes();
+					
 						List<BodyDeclaration> bd = n.getMembers();
-
 						
 						for(BodyDeclaration member: bd){
 							
@@ -48,8 +46,13 @@ public class ListClassExample {
 								privateAttributes.put(field.getType().toString(), field.getVariables().get(0).getId().getName());
 							}
 							}
+						}*/
+						try {
+							parseStructure.generateUML(parseStructure);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-						parseStructure.generateUML(privateAttributes);
 					}
 				}.visit(JavaParser.parse(file), null);
 				System.out.println(); // empty line
@@ -61,10 +64,9 @@ public class ListClassExample {
 
 
 	public static void main(String[] args) {
-		File projectDir = new File("E:/workspaces/CMPE202/JavaParser/src/com/parser");
-
-		listClasses(projectDir);
-		//listMethodCalls(projectDir);
+		ParseStructure parseStructure = new ParseStructure();
+		File projectDir = new File("E:/workspaces/CMPE202/JavaParser/src/com/parser/");
+		listClasses(projectDir , parseStructure);
 	}
 	
 	
