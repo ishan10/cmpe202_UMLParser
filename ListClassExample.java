@@ -22,7 +22,7 @@ public class ListClassExample {
 	
 	
 	public static void listClasses(File projectDir, ParseStructure parseStructure) {
-		new DirExplorer((level, path, file) -> path.endsWith(".java"), (level, path, file) -> {
+		new DirExplorer((level, path, file) -> path.endsWith("A.java"), (level, path, file) -> {
 			System.out.println(path);
 			System.out.println(Strings.repeat("=", path.length()));
 			try {
@@ -32,21 +32,21 @@ public class ListClassExample {
 						
 						super.visit(n, arg);
 						//String className = n.getName();
-						parseStructure.getClassNames().add(n.getName());
-					/*	Map<String,String> privateAttributes = parseStructure.getPrivateClassAttributes();
+						parseStructure.setClassName(n.getName());
+						Map<String,String> privateAttributes = parseStructure.getPrivateClassAttributes();
 					
 						List<BodyDeclaration> bd = n.getMembers();
 						
 						for(BodyDeclaration member: bd){
 							
 							if(member instanceof FieldDeclaration){
-						//	Map<Integer, ArrayList<String>> classAttributes = parseStructure.getClassAttributes();
+							Map<Integer, ArrayList<String>> classAttributes = parseStructure.getClassAttributes();
 								FieldDeclaration field = (FieldDeclaration) member;
 							if( field.getModifiers()==2){
 								privateAttributes.put(field.getType().toString(), field.getVariables().get(0).getId().getName());
 							}
 							}
-						}*/
+						}
 						try {
 							parseStructure.generateUML(parseStructure);
 						} catch (IOException e) {
