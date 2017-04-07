@@ -102,7 +102,7 @@ public class ParseStructure {
 		SourceStringReader reader = new SourceStringReader(printLine.toString());
 		//System.out.println(reader);
 
-        FileOutputStream output = new FileOutputStream(new File("E:/workspaces/CMPE202/JavaParser/src/com/parser/test.png"));
+        FileOutputStream output = new FileOutputStream(new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test.png"));
 
         reader.generateImage(output, new FileFormatOption(FileFormat.PNG, false));
 

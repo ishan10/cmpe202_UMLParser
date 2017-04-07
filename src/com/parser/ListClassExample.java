@@ -15,6 +15,7 @@ import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.expr.MethodCallExpr;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.base.Strings;
+import com.parser.DirExplorer;
 import com.parser.ParseStructure;
 
 public class ListClassExample {
@@ -65,7 +66,7 @@ public class ListClassExample {
 
 	public static void main(String[] args) {
 		ParseStructure parseStructure = new ParseStructure();
-		File projectDir = new File("E:/workspaces/CMPE202/JavaParser/src/com/parser/");
+		File projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/");
 		listClasses(projectDir , parseStructure);
 	}
 	

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="E:/MS in SE/Sem 3 -- Spring 2017/CMPE 202/Parser/com.google.guava_1.6.0.jar"/>
+	<classpathentry kind="lib" path="E:/MS in SE/Sem 3 -- Spring 2017/CMPE 202/Parser/graphviz-api-1.1.jar"/>
+	<classpathentry kind="lib" path="E:/MS in SE/Sem 3 -- Spring 2017/CMPE 202/Parser/javaparser-1.0.8.jar"/>
+	<classpathentry kind="lib" path="E:/MS in SE/Sem 3 -- Spring 2017/CMPE 202/Parser/plantuml.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
