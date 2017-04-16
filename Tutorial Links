@@ -1,2 +1,3 @@
 --> http://plantuml.com/class-diagram
 --> https://github.com/javaparser/javaparser/wiki/Manual
+--> http://www.programcreek.com/java-api-examples/index.php?api=japa.parser.ast.body.ClassOrInterfaceDeclaration //reference to JavaParser usage
