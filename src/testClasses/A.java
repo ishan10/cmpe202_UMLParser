@@ -1,4 +1,4 @@
-package com.parser;
+package testClasses;
 
 import java.util.Collection;
 

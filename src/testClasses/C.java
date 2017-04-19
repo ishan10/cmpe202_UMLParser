@@ -1,4 +1,4 @@
-package com.parser;
+package testClasses;
 
 public class C {
 	 

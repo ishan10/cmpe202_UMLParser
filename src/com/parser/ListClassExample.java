@@ -64,11 +64,11 @@ public class ListClassExample {
 	}
 
 
-	public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		ParseStructure parseStructure = new ParseStructure();
 		File projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/");
 		listClasses(projectDir , parseStructure);
-	}
+	}*/
 	
 	
 }
