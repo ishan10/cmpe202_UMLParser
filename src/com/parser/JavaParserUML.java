@@ -9,12 +9,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.parser.beans.AttributeStructure;
 import com.parser.beans.ClassStructure;
 
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.body.BodyDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.FieldDeclaration;
+import japa.parser.ast.body.ModifierSet;
 import japa.parser.ast.body.TypeDeclaration;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
@@ -43,10 +47,9 @@ public class JavaParserUML {
 			CompilationUnit cu = JavaParser.parse(file);
 			// System.out.println(cu);
 			ClassStructure parsedStructure = new ClassStructure();
+
 			List<TypeDeclaration> types = cu.getTypes();
-
 			for (TypeDeclaration type : types) {
-
 				if (type instanceof ClassOrInterfaceDeclaration) {
 					ClassOrInterfaceDeclaration className = (ClassOrInterfaceDeclaration) type;
 					// System.err.println(className.getName());
@@ -58,8 +61,30 @@ public class JavaParserUML {
 					}
 
 				}
+
+				List<BodyDeclaration> classMembers = type.getMembers();
+				List<AttributeStructure> attributeStructure = new ArrayList<AttributeStructure>();
+				for (BodyDeclaration classAttribute : classMembers) {
+					AttributeStructure attrs = new AttributeStructure();
+					System.out.println(classAttribute);
+					if (classAttribute instanceof FieldDeclaration) {
+						FieldDeclaration field = (FieldDeclaration) classAttribute;
+						System.out.println(field.getModifiers());
+						// attrs.setAttributeaccessModifier(field.getModifiers());
+						if (field.getModifiers() == ModifierSet.PUBLIC) {
+							attrs.setAttributeaccessModifier("public");
+						} else if (field.getModifiers() == ModifierSet.PRIVATE) {
+							attrs.setAttributeaccessModifier("private");
+						}
+						attrs.setAttributeName(field.getVariables().get(0).getId().getName());
+						attrs.setAttributeType(field.getType().toString());
+						attributeStructure.add(attrs);
+					}
+					parsedStructure.setAttributes(attributeStructure);
+				}
 				parsedList.add(parsedStructure);
 			}
+
 		}
 
 		generateUml(parsedList);
@@ -74,21 +99,31 @@ public class JavaParserUML {
 			String className = classValues.getClassName();
 			System.out.println(className);
 			printLine.append("class " + className + " {\n");
+			if (classValues.getAttributes() != null) {
+				List<AttributeStructure> attrList = classValues.getAttributes();
+				for (AttributeStructure attr : attrList) {
+					if (attr.getAttributeaccessModifier() == "private") {
+						printLine.append("-" +attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
+					} else if (attr.getAttributeaccessModifier() == "public") {
+						printLine.append("+" +attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
+					}
+				}
+			}
 			printLine.append("}\n");
 			// }
 		}
-			/* printLine.append("A -> B\n"); */
-			
-			printLine.append("@enduml\n");
-		//	printLine.append("dfdf");
+		/* printLine.append("A -> B\n"); */
 
-			SourceStringReader reader = new SourceStringReader(printLine.toString());
-			// System.out.println(reader);
+		printLine.append("@enduml\n");
+		// printLine.append("dfdf");
 
-			FileOutputStream output = new FileOutputStream(
-					new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test.png"));
+		SourceStringReader reader = new SourceStringReader(printLine.toString());
+		// System.out.println(reader);
 
-			reader.generateImage(output, new FileFormatOption(FileFormat.PNG, false));
-		}
-	
+		FileOutputStream output = new FileOutputStream(
+				new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test.png"));
+
+		reader.generateImage(output, new FileFormatOption(FileFormat.PNG, false));
+	}
+
 }
