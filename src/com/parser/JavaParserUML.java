@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import com.parser.beans.AttributeStructure;
 import com.parser.beans.ClassStructure;
+import com.parser.beans.MethodStructure;
 
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
@@ -18,6 +19,7 @@ import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.BodyDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
 import japa.parser.ast.body.FieldDeclaration;
+import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.ModifierSet;
 import japa.parser.ast.body.TypeDeclaration;
 import net.sourceforge.plantuml.FileFormat;
@@ -64,10 +66,12 @@ public class JavaParserUML {
 
 				List<BodyDeclaration> classMembers = type.getMembers();
 				List<AttributeStructure> attributeStructure = new ArrayList<AttributeStructure>();
+				List<MethodStructure> methodStructure = new ArrayList<MethodStructure>();
 				for (BodyDeclaration classAttribute : classMembers) {
-					AttributeStructure attrs = new AttributeStructure();
+					
 					System.out.println(classAttribute);
 					if (classAttribute instanceof FieldDeclaration) {
+						AttributeStructure attrs = new AttributeStructure();
 						FieldDeclaration field = (FieldDeclaration) classAttribute;
 						System.out.println(field.getModifiers());
 						// attrs.setAttributeaccessModifier(field.getModifiers());
@@ -80,7 +84,22 @@ public class JavaParserUML {
 						attrs.setAttributeType(field.getType().toString());
 						attributeStructure.add(attrs);
 					}
+					if (classAttribute instanceof MethodDeclaration) {
+						MethodStructure methodStruct = new MethodStructure();
+						MethodDeclaration methoDec = (MethodDeclaration) classAttribute;
+					//	System.out.println(field.getModifiers());
+						// attrs.setAttributeaccessModifier(field.getModifiers());
+						if (methoDec.getModifiers() == ModifierSet.PUBLIC) {
+							methodStruct.setMethodAccessModifier("public");
+						} else if (methoDec.getModifiers() == ModifierSet.PRIVATE) {
+							methodStruct.setMethodAccessModifier("private");
+						}
+						methodStruct.setMethodName(methoDec.getName());
+						methodStruct.setMethodReturnType(methoDec.getType().toString());
+						methodStructure.add(methodStruct);
+					}
 					parsedStructure.setAttributes(attributeStructure);
+					parsedStructure.setMethods(methodStructure);
 				}
 				parsedList.add(parsedStructure);
 			}
@@ -106,6 +125,16 @@ public class JavaParserUML {
 						printLine.append("-" +attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
 					} else if (attr.getAttributeaccessModifier() == "public") {
 						printLine.append("+" +attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
+					}
+				}
+			}
+			if (classValues.getMethods() != null) {
+				List<MethodStructure> metList = classValues.getMethods();
+				for (MethodStructure methoDec : metList) {
+					if (methoDec.getMethodAccessModifier() == "private") {
+						printLine.append("-" +methoDec.getMethodName() + "() :" + methoDec.getMethodReturnType() + "\n");
+					} else if (methoDec.getMethodAccessModifier() == "public") {
+						printLine.append("+" +methoDec.getMethodName() + "() :" + methoDec.getMethodReturnType() + "\n");
 					}
 				}
 			}
