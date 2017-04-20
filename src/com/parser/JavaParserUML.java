@@ -118,7 +118,8 @@ public class JavaParserUML {
 			// System.err.println(sourceClassName.toString());
 
 			RelationBean parsedRel = generateRelationships(field.getType().toString(), sourceClassName.getClassName());
-			attrs.setAttributeType(field.getType().toString());
+			// attrs.setAttributeType(field.getType().toString());
+			attrs.setRelationFlag(true);
 			parsedRelations.add(parsedRel);
 			// System.err.println(field.getType().toString());
 
@@ -171,10 +172,12 @@ public class JavaParserUML {
 			if (classValues.getAttributes() != null) {
 				List<AttributeStructure> attrList = classValues.getAttributes();
 				for (AttributeStructure attr : attrList) {
+					if(!attr.isRelationFlag()){
 					if (attr.getAttributeaccessModifier() == "private") {
 						printLine.append("-" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
 					} else if (attr.getAttributeaccessModifier() == "public") {
 						printLine.append("+" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
+					}
 					}
 
 				}

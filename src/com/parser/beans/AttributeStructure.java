@@ -9,6 +9,7 @@ public class AttributeStructure {
 	private String attributeName;
 	private String attributeMultiplicity;
 	private List<RelationBean> relationBean;
+	private boolean relationFlag;
 
 	public String getAttributeaccessModifier() {
 		return attributeaccessModifier;
@@ -50,9 +51,17 @@ public class AttributeStructure {
 		this.relationBean = relationBean;
 	}
 
+	public boolean isRelationFlag() {
+		return relationFlag;
+	}
+
+	public void setRelationFlag(boolean relationFlag) {
+		this.relationFlag = relationFlag;
+	}
+
 	public static String createAssociation(String sourceClass, String associatedClass) {
-		String str =sourceClass +"--" +associatedClass;
+		String str = sourceClass + "--" + associatedClass;
 		return str;
-		
+
 	}
 }
