@@ -8,7 +8,7 @@ public class A {
 	 
 	private int[] y;
 	 
-//	private Collection<B> b;
+	private Collection<B> b;
 	 
 	private C c;
 	 

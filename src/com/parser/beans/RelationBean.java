@@ -30,4 +30,5 @@ public class RelationBean {
 		this.relationType = relationType;
 	}
 
+	
 }
