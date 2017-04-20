@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import com.parser.beans.AttributeStructure;
 import com.parser.beans.ClassStructure;
 import com.parser.beans.MethodStructure;
+import com.parser.beans.RelationBean;
 
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
@@ -22,6 +23,8 @@ import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.ModifierSet;
 import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.type.PrimitiveType;
+import japa.parser.ast.type.ReferenceType;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
@@ -67,13 +70,16 @@ public class JavaParserUML {
 				List<BodyDeclaration> classMembers = type.getMembers();
 				List<AttributeStructure> attributeStructure = new ArrayList<AttributeStructure>();
 				List<MethodStructure> methodStructure = new ArrayList<MethodStructure>();
+				
+				
 				for (BodyDeclaration classAttribute : classMembers) {
-
-					System.out.println(classAttribute);
+				//	System.out.println(classAttribute);
+					//Get the class attributes
 					if (classAttribute instanceof FieldDeclaration) {
-						AttributeStructure parsedAttrs = getClassAttributres(classAttribute);
+						AttributeStructure parsedAttrs = getClassAttributres(classAttribute , parsedStructure);
 						attributeStructure.add(parsedAttrs);
 					}
+					//Get the class methods
 					if (classAttribute instanceof MethodDeclaration) {
 						MethodStructure methodStruct = getClassMethods(classAttribute);
 						methodStructure.add(methodStruct);
@@ -90,19 +96,38 @@ public class JavaParserUML {
 
 	}
 
-	public static AttributeStructure getClassAttributres(BodyDeclaration classAttribute) {
+	public static AttributeStructure getClassAttributres(BodyDeclaration classAttribute, ClassStructure sourceClassName) {
 
 		AttributeStructure attrs = new AttributeStructure();
+		List<RelationBean> parsedRelations = new ArrayList<RelationBean>();
+		
 		FieldDeclaration field = (FieldDeclaration) classAttribute;
-		System.out.println(field.getModifiers());
+	//	System.out.println(field.getModifiers());
 		// attrs.setAttributeaccessModifier(field.getModifiers());
 		if (field.getModifiers() == ModifierSet.PUBLIC) {
 			attrs.setAttributeaccessModifier("public");
 		} else if (field.getModifiers() == ModifierSet.PRIVATE) {
 			attrs.setAttributeaccessModifier("private");
 		}
+		String attrType = field.getType().toString();
+		if (attrType.equals("int") || attrType.equals("String") || attrType.equals("int[]")) {
+			attrs.setAttributeType(field.getType().toString());
+        }
+		else{
+			
+			//System.err.println(sourceClassName.toString());
+			RelationBean rel = new RelationBean();
+			rel.setSourceClass(sourceClassName.getClassName());
+			rel.setAssociatedClass(field.getType().toString());
+			parsedRelations.add(rel);
+			//System.err.println(field.getType().toString());
+			
+		}
+		attrs.setRelationBean(parsedRelations);
 		attrs.setAttributeName(field.getVariables().get(0).getId().getName());
-		attrs.setAttributeType(field.getType().toString());
+		
+			
+		
 		return attrs;
 
 	}
@@ -129,7 +154,7 @@ public class JavaParserUML {
 		printLine.append("skinparam classAttributeIconSize 0\n");
 		for (ClassStructure classValues : parsedList) {
 			String className = classValues.getClassName();
-			System.out.println(className);
+		//	System.out.println(className);
 			printLine.append("class " + className + " {\n");
 			if (classValues.getAttributes() != null) {
 				List<AttributeStructure> attrList = classValues.getAttributes();
@@ -139,6 +164,7 @@ public class JavaParserUML {
 					} else if (attr.getAttributeaccessModifier() == "public") {
 						printLine.append("+" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
 					}
+					
 				}
 			}
 			if (classValues.getMethods() != null) {
@@ -154,6 +180,14 @@ public class JavaParserUML {
 				}
 			}
 			printLine.append("}\n");
+			if(classValues.getAttributes() != null && classValues.getAttributes().get(0).getRelationBean() != null){
+				List <RelationBean> rels =   classValues.getAttributes().get(0).getRelationBean();
+				for (RelationBean rb : rels){
+					String parsedAssociation = classValues.getAttributes().get(0).createAssociation(rb.getSourceClass(), rb.getAssociatedClass());
+					printLine.append(parsedAssociation+"\n");
+				}
+				
+			}
 			// }
 		}
 		/* printLine.append("A -> B\n"); */

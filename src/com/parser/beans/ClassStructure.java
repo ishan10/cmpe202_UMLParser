@@ -8,6 +8,8 @@ public class ClassStructure {
 	private List<AttributeStructure> attributes;
 	private boolean anInterface;
 	
+	
+	
 	public String getClassName() {
 		return className;
 	}
