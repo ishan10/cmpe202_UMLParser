@@ -1,4 +1,4 @@
-package testClasses;
+package testClasses.test1;
 
 import java.util.Collection;
 

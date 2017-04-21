@@ -3,12 +3,14 @@ package com.parser.beans;
 import java.util.List;
 
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.ConstructorDeclaration;
 import japa.parser.ast.type.ClassOrInterfaceType;
 
 public class ClassStructure {
 	private String className;
 	private List<ClassOrInterfaceType> extendsList;
 	private List<ClassOrInterfaceType> implementsList;
+	private List<ConstructorStructure> constructorList;
 	private List<MethodStructure> methods;
 	private List<AttributeStructure> attributes;
 	private boolean anInterface;
@@ -35,6 +37,14 @@ public class ClassStructure {
 
 	public void setImplementsList(List<ClassOrInterfaceType> implementsList) {
 		this.implementsList = implementsList;
+	}
+
+	public List<ConstructorStructure> getConstructorList() {
+		return constructorList;
+	}
+
+	public void setConstructorList(List<ConstructorStructure> constructorList) {
+		this.constructorList = constructorList;
 	}
 
 	public List<MethodStructure> getMethods() {

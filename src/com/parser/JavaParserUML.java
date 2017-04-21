@@ -11,7 +11,9 @@ import java.util.Map.Entry;
 
 import com.parser.beans.AttributeStructure;
 import com.parser.beans.ClassStructure;
+import com.parser.beans.ConstructorStructure;
 import com.parser.beans.MethodStructure;
+import com.parser.beans.ParameterStructure;
 import com.parser.beans.RelationBean;
 import com.sun.org.apache.bcel.internal.generic.RET;
 
@@ -20,9 +22,11 @@ import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
 import japa.parser.ast.body.BodyDeclaration;
 import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.ConstructorDeclaration;
 import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.ModifierSet;
+import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.PrimitiveType;
@@ -34,7 +38,7 @@ import net.sourceforge.plantuml.SourceStringReader;
 public class JavaParserUML {
 
 	public static void main(String[] args) {
-		File[] projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test5").listFiles();
+		File[] projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test1").listFiles();
 		try {
 			listClasses(projectDir);
 		} catch (ParseException e) {
@@ -76,6 +80,7 @@ public class JavaParserUML {
 				List<BodyDeclaration> classMembers = type.getMembers();
 				List<AttributeStructure> attributeStructure = new ArrayList<AttributeStructure>();
 				List<MethodStructure> methodStructure = new ArrayList<MethodStructure>();
+				List<ConstructorStructure> constStructure = new ArrayList<ConstructorStructure>();
 
 				for (BodyDeclaration classAttribute : classMembers) {
 					// System.out.println(classAttribute);
@@ -84,13 +89,20 @@ public class JavaParserUML {
 						AttributeStructure parsedAttrs = getClassAttributres(classAttribute, parsedStructure);
 						attributeStructure.add(parsedAttrs);
 					}
+					parsedStructure.setAttributes(attributeStructure);
 					// Get the class methods
 					if (classAttribute instanceof MethodDeclaration) {
 						MethodStructure methodStruct = getClassMethods(classAttribute);
 						methodStructure.add(methodStruct);
 					}
-					parsedStructure.setAttributes(attributeStructure);
 					parsedStructure.setMethods(methodStructure);
+
+					if (classAttribute instanceof ConstructorDeclaration) {
+						ConstructorStructure constDetails = getClassConstrutors(classAttribute);
+						constStructure.add(constDetails);
+					}
+					parsedStructure.setConstructorList(constStructure);
+
 				}
 				parsedList.add(parsedStructure);
 			}
@@ -152,6 +164,34 @@ public class JavaParserUML {
 
 	}
 
+	public static ConstructorStructure getClassConstrutors(BodyDeclaration classAttribute) {
+		ConstructorStructure constStruct = new ConstructorStructure();
+		List<ParameterStructure> params = new ArrayList<ParameterStructure>();
+		// ParameterStructure par =
+		ConstructorDeclaration constDec = (ConstructorDeclaration) classAttribute;
+		if (constDec.getModifiers() == ModifierSet.PUBLIC) {
+			constStruct.setConstAccessModifier("public");
+		} else if (constDec.getModifiers() == ModifierSet.PRIVATE) {
+			constStruct.setConstAccessModifier("private");
+		}
+		constStruct.setConstName(constDec.getName());
+
+		ParameterStructure parStruct = new ParameterStructure();
+		if(constDec.getParameters() != null && !constDec.getParameters().isEmpty()){
+		for (Parameter par : constDec.getParameters()) {
+			parStruct.setParameterName(par.getId().getName());
+			parStruct.setParameterType(par.getType().toString());
+		}
+		params.add(parStruct);
+		}
+		
+
+		constStruct.setConstParameters(params);
+
+		return constStruct;
+
+	}
+
 	public static RelationBean generateRelationships(String relType, String sourceClassName) {
 		RelationBean rel = new RelationBean();
 		if (relType.contains("Collection<")) {
@@ -189,6 +229,28 @@ public class JavaParserUML {
 						}
 					}
 
+				}
+			}
+			if (classValues.getConstructorList() != null) {
+				List<ConstructorStructure> constList = classValues.getConstructorList();
+				for (ConstructorStructure constDec : constList) {
+					/*
+					 * if (methoDec.getMethodAccessModifier() == "private") {
+					 * printLine.append( "-" + methoDec.getMethodName() + "() :"
+					 * + methoDec.getMethodReturnType() + "\n"); } else
+					 */ if (constDec.getConstAccessModifier() == "public") {
+						printLine.append("+" + constDec.getConstName() + "(");
+					}
+					if (!constDec.getConstParameters().isEmpty()) {
+						for (int i = 0; i < constDec.getConstParameters().size(); i++) {
+							if (i == 0) {
+								printLine.append(constDec.getConstParameters().get(i).getParameterName() + " : "
+										+ constDec.getConstParameters().get(i).getParameterType());
+
+							}
+						}
+					}
+					printLine.append(") \n");
 				}
 			}
 			if (classValues.getMethods() != null) {
@@ -241,7 +303,7 @@ public class JavaParserUML {
 		// System.out.println(reader);
 
 		FileOutputStream output = new FileOutputStream(
-				new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test.png"));
+				new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test1.png"));
 
 		reader.generateImage(output, new FileFormatOption(FileFormat.PNG, false));
 	}
