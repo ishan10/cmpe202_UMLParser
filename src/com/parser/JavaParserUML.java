@@ -34,7 +34,7 @@ import net.sourceforge.plantuml.SourceStringReader;
 public class JavaParserUML {
 
 	public static void main(String[] args) {
-		File[] projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test3").listFiles();
+		File[] projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test5").listFiles();
 		try {
 			listClasses(projectDir);
 		} catch (ParseException e) {
