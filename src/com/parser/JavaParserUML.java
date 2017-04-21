@@ -24,6 +24,7 @@ import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.ModifierSet;
 import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.PrimitiveType;
 import japa.parser.ast.type.ReferenceType;
 import net.sourceforge.plantuml.FileFormat;
@@ -33,7 +34,7 @@ import net.sourceforge.plantuml.SourceStringReader;
 public class JavaParserUML {
 
 	public static void main(String[] args) {
-		File[] projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses").listFiles();
+		File[] projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test3").listFiles();
 		try {
 			listClasses(projectDir);
 		} catch (ParseException e) {
@@ -58,11 +59,15 @@ public class JavaParserUML {
 			for (TypeDeclaration type : types) {
 				if (type instanceof ClassOrInterfaceDeclaration) {
 					ClassOrInterfaceDeclaration className = (ClassOrInterfaceDeclaration) type;
-					// System.err.println(className.getName());
+					System.err.println(className.getName());
 					if (className.isInterface()) {
+
+						System.out.println("its an interface");
 						parsedStructure.setClassName(className.getName());
 						parsedStructure.setAnInterface(true);
 					} else {
+						parsedStructure.setExtendsList(className.getExtends());
+						parsedStructure.setImplementsList(className.getImplements());
 						parsedStructure.setClassName(className.getName());
 					}
 
@@ -167,17 +172,21 @@ public class JavaParserUML {
 		printLine.append("skinparam classAttributeIconSize 0\n");
 		for (ClassStructure classValues : parsedList) {
 			String className = classValues.getClassName();
-			// System.out.println(className);
-			printLine.append("class " + className + " {\n");
+			System.out.println(className);
+			if (classValues.isAnInterface()) {
+				printLine.append("interface " + className + " {\n");
+			} else {
+				printLine.append("class " + className + " {\n");
+			}
 			if (classValues.getAttributes() != null) {
 				List<AttributeStructure> attrList = classValues.getAttributes();
 				for (AttributeStructure attr : attrList) {
-					if(!attr.isRelationFlag()){
-					if (attr.getAttributeaccessModifier() == "private") {
-						printLine.append("-" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
-					} else if (attr.getAttributeaccessModifier() == "public") {
-						printLine.append("+" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
-					}
+					if (!attr.isRelationFlag()) {
+						if (attr.getAttributeaccessModifier() == "private") {
+							printLine.append("-" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
+						} else if (attr.getAttributeaccessModifier() == "public") {
+							printLine.append("+" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
+						}
 					}
 
 				}
@@ -185,27 +194,41 @@ public class JavaParserUML {
 			if (classValues.getMethods() != null) {
 				List<MethodStructure> metList = classValues.getMethods();
 				for (MethodStructure methoDec : metList) {
-					if (methoDec.getMethodAccessModifier() == "private") {
-						printLine.append(
-								"-" + methoDec.getMethodName() + "() :" + methoDec.getMethodReturnType() + "\n");
-					} else if (methoDec.getMethodAccessModifier() == "public") {
+					/*
+					 * if (methoDec.getMethodAccessModifier() == "private") {
+					 * printLine.append( "-" + methoDec.getMethodName() + "() :"
+					 * + methoDec.getMethodReturnType() + "\n"); } else
+					 */ if (methoDec.getMethodAccessModifier() == "public") {
 						printLine.append(
 								"+" + methoDec.getMethodName() + "() :" + methoDec.getMethodReturnType() + "\n");
 					}
 				}
 			}
 			printLine.append("}\n");
-			if (classValues.getAttributes() != null && classValues.getAttributes().get(0).getRelationBean() != null) {
-				List<RelationBean> rels = classValues.getAttributes().get(0).getRelationBean();
-				for (RelationBean rb : rels) {
-					if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
-						String parsedAssociation = classValues.getAttributes().get(0)
-								.createAssociation(rb.getSourceClass(), rb.getAssociatedClass());
-						printLine.append(parsedAssociation + "\n");
-					}
-
+			if (classValues.getExtendsList() != null && !classValues.getExtendsList().isEmpty()) {
+				for (ClassOrInterfaceType ext : classValues.getExtendsList()) {
+					printLine.append(ext.getName() + " <|-- " + classValues.getClassName() + "\n");
 				}
+			}
 
+			if (classValues.getImplementsList() != null && !classValues.getImplementsList().isEmpty()) {
+				for (ClassOrInterfaceType ext : classValues.getImplementsList()) {
+					printLine.append(ext.getName() + " <|.. " + classValues.getClassName() + "\n");
+				}
+			}
+
+			if (classValues.getAttributes() != null) {
+				if (!classValues.getAttributes().isEmpty()) {
+					List<RelationBean> rels = classValues.getAttributes().get(0).getRelationBean();
+					for (RelationBean rb : rels) {
+						if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
+							String parsedAssociation = classValues.getAttributes().get(0)
+									.createAssociation(rb.getSourceClass(), rb.getAssociatedClass());
+							printLine.append(parsedAssociation + "\n");
+						}
+
+					}
+				}
 			}
 			// }
 		}
