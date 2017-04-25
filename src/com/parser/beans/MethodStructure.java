@@ -41,7 +41,7 @@ public class MethodStructure {
 		this.methodParameters = methodParameters;
 	}
 
-	public String createDependecy(String sourceClass, String associatedClass) {
+	public String createDependency(String sourceClass, String associatedClass) {
 		String str = sourceClass + "..>" + associatedClass;
 		return str;
 

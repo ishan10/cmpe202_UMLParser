@@ -63,7 +63,7 @@ public class JavaParserUML {
 			for (TypeDeclaration type : types) {
 				if (type instanceof ClassOrInterfaceDeclaration) {
 					ClassOrInterfaceDeclaration className = (ClassOrInterfaceDeclaration) type;
-				//	System.err.println(className.getName());
+					// System.err.println(className.getName());
 					if (className.isInterface()) {
 
 						System.out.println("its an interface");
@@ -92,13 +92,13 @@ public class JavaParserUML {
 					parsedStructure.setAttributes(attributeStructure);
 					// Get the class methods
 					if (classAttribute instanceof MethodDeclaration) {
-						MethodStructure methodStruct = getClassMethods(classAttribute,parsedStructure);
+						MethodStructure methodStruct = getClassMethods(classAttribute, parsedStructure);
 						methodStructure.add(methodStruct);
 					}
 					parsedStructure.setMethods(methodStructure);
 
 					if (classAttribute instanceof ConstructorDeclaration) {
-						ConstructorStructure constDetails = getClassConstrutors(classAttribute);
+						ConstructorStructure constDetails = getClassConstrutors(classAttribute, parsedStructure);
 						constStructure.add(constDetails);
 					}
 					parsedStructure.setConstructorList(constStructure);
@@ -152,7 +152,7 @@ public class JavaParserUML {
 		MethodStructure methodStruct = new MethodStructure();
 		MethodDeclaration methoDec = (MethodDeclaration) classAttribute;
 		List<ParameterStructure> methodParams = new ArrayList<ParameterStructure>();
-		
+
 		// System.out.println(field.getModifiers());
 		// attrs.setAttributeaccessModifier(field.getModifiers());
 		if (methoDec.getModifiers() == ModifierSet.PUBLIC) {
@@ -161,49 +161,76 @@ public class JavaParserUML {
 			methodStruct.setMethodAccessModifier("private");
 		}
 		methodStruct.setMethodName(methoDec.getName());
-		if(methoDec.getParameters()!=null && !methoDec.getParameters().isEmpty()){
+		if (methoDec.getParameters() != null && !methoDec.getParameters().isEmpty()) {
 			ParameterStructure parStruct = new ParameterStructure();
-			for(Parameter param : methoDec.getParameters()){
-				if(param.getType().getClass().getSimpleName().equalsIgnoreCase("ReferenceType")){
+			List<RelationBean> parsedDependency = new ArrayList<RelationBean>();
+			for (Parameter param : methoDec.getParameters()) {
+				if (param.getType().getClass().getSimpleName().equalsIgnoreCase("ReferenceType")) {
+
 					System.out.println("Rastapopulous");
+
+					RelationBean dependency = generateDependecy(param.getType().toString(),
+							sourceClassName.getClassName());
+					if (dependency != null) {
+						parsedDependency.add(dependency);
+
+						parStruct.setRelationBean(parsedDependency);
+						parStruct.setRelationFlag(true);
+					}
 				}
+
 				parStruct.setParameterName(param.getId().getName());
 				parStruct.setParameterType(param.getType().toString());
-				//parStruct.set
+				// parStruct.set
 				System.out.println(param.getId().getName());
-				
+
 			}
 			methodParams.add(parStruct);
 			methodStruct.setMethodParameters(methodParams);
 		}
-		
+
 		methodStruct.setMethodReturnType(methoDec.getType().toString());
 		return methodStruct;
 
 	}
 
-	public static ConstructorStructure getClassConstrutors(BodyDeclaration classAttribute) {
+	public static ConstructorStructure getClassConstrutors(BodyDeclaration classConstrutors,ClassStructure sourceClassName) {
 		ConstructorStructure constStruct = new ConstructorStructure();
 		List<ParameterStructure> params = new ArrayList<ParameterStructure>();
 		// ParameterStructure par =
-		ConstructorDeclaration constDec = (ConstructorDeclaration) classAttribute;
+		ConstructorDeclaration constDec = (ConstructorDeclaration) classConstrutors;
 		if (constDec.getModifiers() == ModifierSet.PUBLIC) {
 			constStruct.setConstAccessModifier("public");
 		} else if (constDec.getModifiers() == ModifierSet.PRIVATE) {
 			constStruct.setConstAccessModifier("private");
 		}
 		constStruct.setConstName(constDec.getName());
-
-		ParameterStructure parStruct = new ParameterStructure();
 		if (constDec.getParameters() != null && !constDec.getParameters().isEmpty()) {
-			for (Parameter par : constDec.getParameters()) {
-				parStruct.setParameterName(par.getId().getName());
-				parStruct.setParameterType(par.getType().toString());
-			}
-			params.add(parStruct);
-		}
+		ParameterStructure parStruct = new ParameterStructure();
+		List<RelationBean> parsedDependency = new ArrayList<RelationBean>();
+		for (Parameter param : constDec.getParameters()) {
+			if (param.getType().getClass().getSimpleName().equalsIgnoreCase("ReferenceType")) {
 
-		constStruct.setConstParameters(params);
+				System.out.println("Rastapopulous");
+
+				RelationBean dependency = generateDependecy(param.getType().toString(),
+						sourceClassName.getClassName());
+				if (dependency != null) {
+					parsedDependency.add(dependency);
+
+					parStruct.setRelationBean(parsedDependency);
+					parStruct.setRelationFlag(true);
+				}
+			}
+			parStruct.setParameterName(param.getId().getName());
+			parStruct.setParameterType(param.getType().toString());
+			// parStruct.set
+			System.out.println(param.getId().getName());
+		}
+			params.add(parStruct);
+			constStruct.setConstParameters(params);
+		}
+		//constStruct.setConstParameters(params);	
 
 		return constStruct;
 
@@ -223,13 +250,28 @@ public class JavaParserUML {
 		return rel;
 	}
 
+	public static RelationBean generateDependecy(String relType, String sourceClassName) {
+		RelationBean rel = new RelationBean();
+		if (!relType.contains("String[]")) {
+
+			rel.setAssociatedClass(relType);
+
+			rel.setSourceClass(sourceClassName);
+			rel.setRelationType("DEPENDENCY");
+			return rel;
+		} else {
+			return null;
+		}
+
+	}
+
 	public static void generateUml(List<ClassStructure> parsedList) throws IOException {
 		StringBuilder printLine = new StringBuilder();
 		printLine.append("@startuml\n");
 		printLine.append("skinparam classAttributeIconSize 0\n");
 		for (ClassStructure classValues : parsedList) {
 			String className = classValues.getClassName();
-		//	System.out.println(className);
+			// System.out.println(className);
 			if (classValues.isAnInterface()) {
 				printLine.append("interface " + className + " {\n");
 			} else {
@@ -258,7 +300,7 @@ public class JavaParserUML {
 					 */ if (constDec.getConstAccessModifier() == "public") {
 						printLine.append("+" + constDec.getConstName() + "(");
 					}
-					if (!constDec.getConstParameters().isEmpty()) {
+					if (constDec.getConstParameters()!=null && !constDec.getConstParameters().isEmpty()) {
 						for (int i = 0; i < constDec.getConstParameters().size(); i++) {
 							if (i == 0) {
 								printLine.append(constDec.getConstParameters().get(i).getParameterName() + " : "
@@ -278,9 +320,8 @@ public class JavaParserUML {
 					 * printLine.append( "-" + methoDec.getMethodName() + "() :"
 					 * + methoDec.getMethodReturnType() + "\n"); } else
 					 */ if (methoDec.getMethodAccessModifier() == "public") {
-						printLine.append(
-								"+" + methoDec.getMethodName() + "(");
-						if (methoDec.getMethodParameters()!=null && !methoDec.getMethodParameters().isEmpty()) {
+						printLine.append("+" + methoDec.getMethodName() + "(");
+						if (methoDec.getMethodParameters() != null && !methoDec.getMethodParameters().isEmpty()) {
 							for (int i = 0; i < methoDec.getMethodParameters().size(); i++) {
 								if (i == 0) {
 									printLine.append(methoDec.getMethodParameters().get(i).getParameterName() + " : "
@@ -289,9 +330,9 @@ public class JavaParserUML {
 								}
 							}
 						}
-					 printLine.append(") : "+methoDec.getMethodReturnType() +" \n");
+						printLine.append(") : " + methoDec.getMethodReturnType() + " \n");
 					}
-					 
+
 				}
 			}
 			printLine.append("}\n");
@@ -314,6 +355,35 @@ public class JavaParserUML {
 						if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
 							String parsedAssociation = classValues.getAttributes().get(0)
 									.createAssociation(rb.getSourceClass(), rb.getAssociatedClass());
+							printLine.append(parsedAssociation + "\n");
+						}
+
+					}
+				}
+			}
+			if (classValues.getMethods() != null && !classValues.getMethods().isEmpty()) {
+				if (classValues.getMethods().get(0).getMethodParameters() != null
+						&& classValues.getMethods().get(0).getMethodParameters().get(0).isRelationFlag()) {
+					List<RelationBean> rels = classValues.getMethods().get(0).getMethodParameters().get(0)
+							.getRelationBean();
+					for (RelationBean rb : rels) {
+						if (rb.getRelationType().equalsIgnoreCase("DEPENDENCY")) {
+							String parsedAssociation = classValues.getMethods().get(0)
+									.createDependency(rb.getSourceClass(), rb.getAssociatedClass());
+							printLine.append(parsedAssociation + "\n");
+						}
+
+					}
+				}
+			}
+			if (classValues.getConstructorList() != null && !classValues.getConstructorList().isEmpty()) {
+				if (classValues.getConstructorList().get(0).getConstParameters() != null
+						&& classValues.getConstructorList().get(0).getConstParameters().get(0).isRelationFlag()) {
+					List<RelationBean> rels = classValues.getConstructorList().get(0).getConstParameters().get(0).getRelationBean();
+					for (RelationBean rb : rels) {
+						if (rb.getRelationType().equalsIgnoreCase("DEPENDENCY")) {
+							String parsedAssociation = classValues.getMethods().get(0)
+									.createDependency(rb.getSourceClass(), rb.getAssociatedClass());
 							printLine.append(parsedAssociation + "\n");
 						}
 

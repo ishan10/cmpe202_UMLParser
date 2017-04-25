@@ -4,7 +4,7 @@ public class C {
 	 
 	private A a;
 	 
-	public void hell(B b){
+	/*public void hell(B b){
 		D d;
-	}
+	}*/
 }
