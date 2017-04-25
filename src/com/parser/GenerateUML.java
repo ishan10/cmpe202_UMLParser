@@ -23,12 +23,13 @@ public class GenerateUML {
 		printLine.append("skinparam classAttributeIconSize 0\n");
 		for (ClassStructure classValues : parsedList) {
 			String className = classValues.getClassName();
-			// System.out.println(className);
+			
 			if (classValues.isAnInterface()) {
 				printLine.append("interface " + className + " {\n");
 			} else {
 				printLine.append("class " + className + " {\n");
 			}
+			
 			if (classValues.getAttributesList() != null) {
 				List<AttributeStructure> attrList = classValues.getAttributesList();
 				for (AttributeStructure attr : attrList) {
@@ -44,12 +45,14 @@ public class GenerateUML {
 			}
 			if (classValues.getConstructorList() != null) {
 				List<ConstructorStructure> constList = classValues.getConstructorList();
+				
 				for (ConstructorStructure constDec : constList) {
 					/*
 					 * if (methoDec.getMethodAccessModifier() == "private") {
 					 * printLine.append( "-" + methoDec.getMethodName() + "() :"
 					 * + methoDec.getMethodReturnType() + "\n"); } else
-					 */ if (constDec.getConstAccessModifier() == "public") {
+					 */ 
+					if (constDec.getConstAccessModifier() == "public") {
 						printLine.append("+" + constDec.getConstName() + "(");
 					}
 					if (constDec.getConstParameters()!=null && !constDec.getConstParameters().isEmpty()) {
@@ -57,7 +60,6 @@ public class GenerateUML {
 							if (i == 0) {
 								printLine.append(constDec.getConstParameters().get(i).getParameterName() + " : "
 										+ constDec.getConstParameters().get(i).getParameterType());
-
 							}
 						}
 					}
@@ -78,16 +80,15 @@ public class GenerateUML {
 								if (i == 0) {
 									printLine.append(methoDec.getMethodParameters().get(i).getParameterName() + " : "
 											+ methoDec.getMethodParameters().get(i).getParameterType());
-
 								}
 							}
 						}
 						printLine.append(") : " + methoDec.getMethodReturnType() + " \n");
 					}
-
 				}
 			}
 			printLine.append("}\n");
+			
 			if (classValues.getExtendsList() != null && !classValues.getExtendsList().isEmpty()) {
 				for (ClassOrInterfaceType ext : classValues.getExtendsList()) {
 					printLine.append(ext.getName() + " <|-- " + classValues.getClassName() + "\n");
@@ -113,6 +114,7 @@ public class GenerateUML {
 					}
 				}
 			}
+			
 			if (classValues.getMethodList() != null && !classValues.getMethodList().isEmpty()) {
 				if (classValues.getMethodList().get(0).getMethodParameters() != null
 						&& classValues.getMethodList().get(0).getMethodParameters().get(0).isRelationFlag()) {
@@ -128,6 +130,7 @@ public class GenerateUML {
 					}
 				}
 			}
+			
 			if (classValues.getConstructorList() != null && !classValues.getConstructorList().isEmpty()) {
 				if (classValues.getConstructorList().get(0).getConstParameters() != null
 						&& classValues.getConstructorList().get(0).getConstParameters().get(0).isRelationFlag()) {
@@ -142,18 +145,14 @@ public class GenerateUML {
 					}
 				}
 			}
-			// }
 		}
-		/* printLine.append("A -> B\n"); */
 
 		printLine.append("@enduml\n");
-		// printLine.append("dfdf");
 
 		SourceStringReader reader = new SourceStringReader(printLine.toString());
-		// System.out.println(reader);
 
-		FileOutputStream output = new FileOutputStream(
-				new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test5.png"));
+		FileOutputStream output = new FileOutputStream(new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test5.png"));
+		
 		System.out.println("UML Gemerated");
 
 		reader.generateImage(output, new FileFormatOption(FileFormat.PNG, false));
