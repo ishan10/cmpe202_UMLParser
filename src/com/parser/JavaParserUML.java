@@ -27,7 +27,7 @@ import japa.parser.ast.body.TypeDeclaration;
 public class JavaParserUML {
 
 	public static void main(String[] args) {
-		File[] input = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test1").listFiles();
+		File[] input = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test5").listFiles();
 		try {
 			listClasses(input);
 		} catch (ParseException e) {
@@ -72,9 +72,10 @@ public class JavaParserUML {
 				}
 
 				List<BodyDeclaration> classMembers = type.getMembers();
-				List<AttributeStructure> attributeStructure = new ArrayList<AttributeStructure>();
-				List<MethodStructure> methodStructure = new ArrayList<MethodStructure>();
-				List<ConstructorStructure> constStructure = new ArrayList<ConstructorStructure>();
+				
+				List<AttributeStructure> attributeStructure = parsedStructure.getAttributesList();
+				List<MethodStructure> methodStructure = parsedStructure.getMethodList();
+				List<ConstructorStructure> constStructure = parsedStructure.getConstructorList();
 
 				for (BodyDeclaration classAttribute : classMembers) {
 
@@ -83,14 +84,14 @@ public class JavaParserUML {
 						AttributeStructure parsedAttrs = getClassAttributres(classAttribute, parsedStructure);
 						attributeStructure.add(parsedAttrs);
 					}
-					parsedStructure.setAttributes(attributeStructure);
+					parsedStructure.setAttributesList(attributeStructure);
 
 					// Parse Class Methods
 					if (classAttribute instanceof MethodDeclaration) {
 						MethodStructure methodStruct = getClassMethods(classAttribute, parsedStructure);
 						methodStructure.add(methodStruct);
 					}
-					parsedStructure.setMethods(methodStructure);
+					parsedStructure.setMethodList(methodStructure);
 
 					// Parse Class Constructors
 					if (classAttribute instanceof ConstructorDeclaration) {

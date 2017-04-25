@@ -1,5 +1,6 @@
 package com.parser.beans;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import japa.parser.ast.type.ClassOrInterfaceType;
@@ -9,9 +10,17 @@ public class ClassStructure {
 	private List<ClassOrInterfaceType> extendsList;
 	private List<ClassOrInterfaceType> implementsList;
 	private List<ConstructorStructure> constructorList;
-	private List<MethodStructure> methods;
-	private List<AttributeStructure> attributes;
+	private List<MethodStructure> methodList;
+	private List<AttributeStructure> attributesList;
 	private boolean anInterface;
+
+	public ClassStructure() {
+		this.extendsList = new ArrayList<ClassOrInterfaceType>();
+		this.implementsList = new ArrayList<ClassOrInterfaceType>();
+		this.constructorList = new ArrayList<ConstructorStructure>();
+		this.methodList = new ArrayList<MethodStructure>();
+		this.attributesList = new ArrayList<AttributeStructure>();
+	}
 
 	public String getClassName() {
 		return className;
@@ -25,8 +34,8 @@ public class ClassStructure {
 		return extendsList;
 	}
 
-	public void setExtendsList(List<ClassOrInterfaceType> list) {
-		this.extendsList = list;
+	public void setExtendsList(List<ClassOrInterfaceType> extendsList) {
+		this.extendsList = extendsList;
 	}
 
 	public List<ClassOrInterfaceType> getImplementsList() {
@@ -45,20 +54,20 @@ public class ClassStructure {
 		this.constructorList = constructorList;
 	}
 
-	public List<MethodStructure> getMethods() {
-		return methods;
+	public List<MethodStructure> getMethodList() {
+		return methodList;
 	}
 
-	public void setMethods(List<MethodStructure> methods) {
-		this.methods = methods;
+	public void setMethodList(List<MethodStructure> methodList) {
+		this.methodList = methodList;
 	}
 
-	public List<AttributeStructure> getAttributes() {
-		return attributes;
+	public List<AttributeStructure> getAttributesList() {
+		return attributesList;
 	}
 
-	public void setAttributes(List<AttributeStructure> attributes) {
-		this.attributes = attributes;
+	public void setAttributesList(List<AttributeStructure> attributesList) {
+		this.attributesList = attributesList;
 	}
 
 	public boolean isAnInterface() {
@@ -68,5 +77,6 @@ public class ClassStructure {
 	public void setAnInterface(boolean anInterface) {
 		this.anInterface = anInterface;
 	}
-
+	
+	
 }

@@ -29,8 +29,8 @@ public class GenerateUML {
 			} else {
 				printLine.append("class " + className + " {\n");
 			}
-			if (classValues.getAttributes() != null) {
-				List<AttributeStructure> attrList = classValues.getAttributes();
+			if (classValues.getAttributesList() != null) {
+				List<AttributeStructure> attrList = classValues.getAttributesList();
 				for (AttributeStructure attr : attrList) {
 					if (!attr.isRelationFlag()) {
 						if (attr.getAttributeaccessModifier() == "private") {
@@ -64,8 +64,8 @@ public class GenerateUML {
 					printLine.append(") \n");
 				}
 			}
-			if (classValues.getMethods() != null) {
-				List<MethodStructure> metList = classValues.getMethods();
+			if (classValues.getMethodList() != null) {
+				List<MethodStructure> metList = classValues.getMethodList();
 				for (MethodStructure methoDec : metList) {
 					/*
 					 * if (methoDec.getMethodAccessModifier() == "private") {
@@ -100,12 +100,12 @@ public class GenerateUML {
 				}
 			}
 
-			if (classValues.getAttributes() != null) {
-				if (!classValues.getAttributes().isEmpty()) {
-					List<RelationBean> rels = classValues.getAttributes().get(0).getRelationBean();
+			if (classValues.getAttributesList() != null) {
+				if (!classValues.getAttributesList().isEmpty()) {
+					List<RelationBean> rels = classValues.getAttributesList().get(0).getRelationBean();
 					for (RelationBean rb : rels) {
 						if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
-							String parsedAssociation = classValues.getAttributes().get(0)
+							String parsedAssociation = classValues.getAttributesList().get(0)
 									.createAssociation(rb.getSourceClass(), rb.getAssociatedClass());
 							printLine.append(parsedAssociation + "\n");
 						}
@@ -113,14 +113,14 @@ public class GenerateUML {
 					}
 				}
 			}
-			if (classValues.getMethods() != null && !classValues.getMethods().isEmpty()) {
-				if (classValues.getMethods().get(0).getMethodParameters() != null
-						&& classValues.getMethods().get(0).getMethodParameters().get(0).isRelationFlag()) {
-					List<RelationBean> rels = classValues.getMethods().get(0).getMethodParameters().get(0)
+			if (classValues.getMethodList() != null && !classValues.getMethodList().isEmpty()) {
+				if (classValues.getMethodList().get(0).getMethodParameters() != null
+						&& classValues.getMethodList().get(0).getMethodParameters().get(0).isRelationFlag()) {
+					List<RelationBean> rels = classValues.getMethodList().get(0).getMethodParameters().get(0)
 							.getRelationBean();
 					for (RelationBean rb : rels) {
 						if (rb.getRelationType().equalsIgnoreCase("DEPENDENCY")) {
-							String parsedAssociation = classValues.getMethods().get(0)
+							String parsedAssociation = classValues.getMethodList().get(0)
 									.createDependency(rb.getSourceClass(), rb.getAssociatedClass());
 							printLine.append(parsedAssociation + "\n");
 						}
@@ -134,7 +134,7 @@ public class GenerateUML {
 					List<RelationBean> rels = classValues.getConstructorList().get(0).getConstParameters().get(0).getRelationBean();
 					for (RelationBean rb : rels) {
 						if (rb.getRelationType().equalsIgnoreCase("DEPENDENCY")) {
-							String parsedAssociation = classValues.getMethods().get(0)
+							String parsedAssociation = classValues.getMethodList().get(0)
 									.createDependency(rb.getSourceClass(), rb.getAssociatedClass());
 							printLine.append(parsedAssociation + "\n");
 						}
@@ -153,7 +153,7 @@ public class GenerateUML {
 		// System.out.println(reader);
 
 		FileOutputStream output = new FileOutputStream(
-				new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test1.png"));
+				new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test5.png"));
 		System.out.println("UML Gemerated");
 
 		reader.generateImage(output, new FileFormatOption(FileFormat.PNG, false));
