@@ -1,13 +1,9 @@
 package com.parser;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.parser.beans.AttributeStructure;
 import com.parser.beans.ClassStructure;
@@ -15,7 +11,6 @@ import com.parser.beans.ConstructorStructure;
 import com.parser.beans.MethodStructure;
 import com.parser.beans.ParameterStructure;
 import com.parser.beans.RelationBean;
-import com.sun.org.apache.bcel.internal.generic.RET;
 
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
@@ -28,19 +23,13 @@ import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.ModifierSet;
 import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
-import japa.parser.ast.type.ClassOrInterfaceType;
-import japa.parser.ast.type.PrimitiveType;
-import japa.parser.ast.type.ReferenceType;
-import net.sourceforge.plantuml.FileFormat;
-import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.SourceStringReader;
 
 public class JavaParserUML {
 
 	public static void main(String[] args) {
-		File[] projectDir = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test1").listFiles();
+		File[] input = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test1").listFiles();
 		try {
-			listClasses(projectDir);
+			listClasses(input);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -50,6 +39,13 @@ public class JavaParserUML {
 		}
 	}
 
+	/*
+	 * Parses all the classes contained in the <INPUT> folder. 
+	 * Parses attributes, methods and constructors to generate relationships
+	 * within classes.
+	 * Returns the data structure to generate the UML Class Diagram
+	 *
+	 */
 	public static void listClasses(File[] projectDir) throws ParseException, IOException {
 
 		List<ClassStructure> parsedList = new ArrayList<ClassStructure>();
@@ -82,20 +78,21 @@ public class JavaParserUML {
 
 				for (BodyDeclaration classAttribute : classMembers) {
 
-					// Get the class attributes
+					// Parse Class Attributes
 					if (classAttribute instanceof FieldDeclaration) {
 						AttributeStructure parsedAttrs = getClassAttributres(classAttribute, parsedStructure);
 						attributeStructure.add(parsedAttrs);
 					}
 					parsedStructure.setAttributes(attributeStructure);
 
-					// Get the class methods
+					// Parse Class Methods
 					if (classAttribute instanceof MethodDeclaration) {
 						MethodStructure methodStruct = getClassMethods(classAttribute, parsedStructure);
 						methodStructure.add(methodStruct);
 					}
 					parsedStructure.setMethods(methodStructure);
 
+					// Parse Class Constructors
 					if (classAttribute instanceof ConstructorDeclaration) {
 						ConstructorStructure constDetails = getClassConstrutors(classAttribute, parsedStructure);
 						constStructure.add(constDetails);
@@ -105,6 +102,7 @@ public class JavaParserUML {
 				parsedList.add(parsedStructure);
 			}
 		}
+	
 		GenerateUML.generateUml(parsedList);
 
 	}
@@ -125,7 +123,7 @@ public class JavaParserUML {
 		}
 
 		String attrType = field.getType().toString();
-		
+
 		if (attrType.equals("int") || attrType.equals("String") || attrType.equals("int[]")) {
 			attrs.setAttributeType(field.getType().toString());
 		} else {
@@ -133,7 +131,7 @@ public class JavaParserUML {
 			attrs.setRelationFlag(true);
 			parsedRelations.add(parsedRel);
 		}
-		
+
 		attrs.setRelationBean(parsedRelations);
 		attrs.setAttributeName(field.getVariables().get(0).getId().getName());
 
@@ -143,9 +141,9 @@ public class JavaParserUML {
 
 	public static MethodStructure getClassMethods(BodyDeclaration classAttribute, ClassStructure sourceClassName) {
 		MethodStructure methodStruct = new MethodStructure();
-		
+
 		MethodDeclaration methoDec = (MethodDeclaration) classAttribute;
-		
+
 		List<ParameterStructure> methodParams = new ArrayList<ParameterStructure>();
 
 		if (methoDec.getModifiers() == ModifierSet.PUBLIC) {
@@ -153,9 +151,9 @@ public class JavaParserUML {
 		} else if (methoDec.getModifiers() == ModifierSet.PRIVATE) {
 			methodStruct.setMethodAccessModifier("private");
 		}
-		
+
 		methodStruct.setMethodName(methoDec.getName());
-		
+
 		if (methoDec.getParameters() != null && !methoDec.getParameters().isEmpty()) {
 			ParameterStructure parsedParameters = parseParameters(methoDec.getParameters(), sourceClassName);
 			methodParams.add(parsedParameters);
@@ -169,19 +167,19 @@ public class JavaParserUML {
 	public static ConstructorStructure getClassConstrutors(BodyDeclaration classConstrutors,
 			ClassStructure sourceClassName) {
 		ConstructorStructure constStruct = new ConstructorStructure();
-		
+
 		List<ParameterStructure> params = new ArrayList<ParameterStructure>();
-		
+
 		ConstructorDeclaration constDec = (ConstructorDeclaration) classConstrutors;
-		
+
 		if (constDec.getModifiers() == ModifierSet.PUBLIC) {
 			constStruct.setConstAccessModifier("public");
 		} else if (constDec.getModifiers() == ModifierSet.PRIVATE) {
 			constStruct.setConstAccessModifier("private");
 		}
-		
+
 		constStruct.setConstName(constDec.getName());
-		
+
 		if (constDec.getParameters() != null && !constDec.getParameters().isEmpty()) {
 			ParameterStructure parsedParameters = parseParameters(constDec.getParameters(), sourceClassName);
 			params.add(parsedParameters);
@@ -193,14 +191,14 @@ public class JavaParserUML {
 	public static ParameterStructure parseParameters(List<Parameter> params, ClassStructure sourceClassName) {
 
 		ParameterStructure parStruct = new ParameterStructure();
-		
+
 		List<RelationBean> parsedDependency = new ArrayList<RelationBean>();
-		
+
 		for (Parameter param : params) {
 			if (param.getType().getClass().getSimpleName().equalsIgnoreCase("ReferenceType")) {
-				
+
 				RelationBean dependency = generateDependecy(param.getType().toString(), sourceClassName.getClassName());
-				
+
 				if (dependency != null) {
 					parsedDependency.add(dependency);
 					parStruct.setRelationBean(parsedDependency);
@@ -215,9 +213,9 @@ public class JavaParserUML {
 	}
 
 	public static RelationBean generateAssociation(String relType, String sourceClassName) {
-		
+
 		RelationBean rel = new RelationBean();
-		
+
 		if (relType.contains("Collection<")) {
 			String asso = relType.substring(relType.indexOf("<") + 1, relType.indexOf(">"));
 			System.out.println(asso);
@@ -225,17 +223,17 @@ public class JavaParserUML {
 		} else {
 			rel.setAssociatedClass(relType);
 		}
-		
+
 		rel.setSourceClass(sourceClassName);
 		rel.setRelationType("ASSOCIATION");
-		
+
 		return rel;
 	}
 
 	public static RelationBean generateDependecy(String relType, String sourceClassName) {
-		
+
 		RelationBean rel = new RelationBean();
-		
+
 		if (!relType.contains("String[]")) {
 			rel.setAssociatedClass(relType);
 			rel.setSourceClass(sourceClassName);
