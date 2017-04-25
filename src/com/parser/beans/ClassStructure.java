@@ -2,8 +2,6 @@ package com.parser.beans;
 
 import java.util.List;
 
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.body.ConstructorDeclaration;
 import japa.parser.ast.type.ClassOrInterfaceType;
 
 public class ClassStructure {

@@ -63,7 +63,7 @@ public class JavaParserUML {
 			for (TypeDeclaration type : types) {
 				if (type instanceof ClassOrInterfaceDeclaration) {
 					ClassOrInterfaceDeclaration className = (ClassOrInterfaceDeclaration) type;
-					System.err.println(className.getName());
+				//	System.err.println(className.getName());
 					if (className.isInterface()) {
 
 						System.out.println("its an interface");
@@ -92,7 +92,7 @@ public class JavaParserUML {
 					parsedStructure.setAttributes(attributeStructure);
 					// Get the class methods
 					if (classAttribute instanceof MethodDeclaration) {
-						MethodStructure methodStruct = getClassMethods(classAttribute);
+						MethodStructure methodStruct = getClassMethods(classAttribute,parsedStructure);
 						methodStructure.add(methodStruct);
 					}
 					parsedStructure.setMethods(methodStructure);
@@ -134,7 +134,7 @@ public class JavaParserUML {
 
 			// System.err.println(sourceClassName.toString());
 
-			RelationBean parsedRel = generateRelationships(field.getType().toString(), sourceClassName.getClassName());
+			RelationBean parsedRel = generateAssociation(field.getType().toString(), sourceClassName.getClassName());
 			// attrs.setAttributeType(field.getType().toString());
 			attrs.setRelationFlag(true);
 			parsedRelations.add(parsedRel);
@@ -148,9 +148,11 @@ public class JavaParserUML {
 
 	}
 
-	public static MethodStructure getClassMethods(BodyDeclaration classAttribute) {
+	public static MethodStructure getClassMethods(BodyDeclaration classAttribute, ClassStructure sourceClassName) {
 		MethodStructure methodStruct = new MethodStructure();
 		MethodDeclaration methoDec = (MethodDeclaration) classAttribute;
+		List<ParameterStructure> methodParams = new ArrayList<ParameterStructure>();
+		
 		// System.out.println(field.getModifiers());
 		// attrs.setAttributeaccessModifier(field.getModifiers());
 		if (methoDec.getModifiers() == ModifierSet.PUBLIC) {
@@ -159,6 +161,22 @@ public class JavaParserUML {
 			methodStruct.setMethodAccessModifier("private");
 		}
 		methodStruct.setMethodName(methoDec.getName());
+		if(methoDec.getParameters()!=null && !methoDec.getParameters().isEmpty()){
+			ParameterStructure parStruct = new ParameterStructure();
+			for(Parameter param : methoDec.getParameters()){
+				if(param.getType().getClass().getSimpleName().equalsIgnoreCase("ReferenceType")){
+					System.out.println("Rastapopulous");
+				}
+				parStruct.setParameterName(param.getId().getName());
+				parStruct.setParameterType(param.getType().toString());
+				//parStruct.set
+				System.out.println(param.getId().getName());
+				
+			}
+			methodParams.add(parStruct);
+			methodStruct.setMethodParameters(methodParams);
+		}
+		
 		methodStruct.setMethodReturnType(methoDec.getType().toString());
 		return methodStruct;
 
@@ -177,14 +195,13 @@ public class JavaParserUML {
 		constStruct.setConstName(constDec.getName());
 
 		ParameterStructure parStruct = new ParameterStructure();
-		if(constDec.getParameters() != null && !constDec.getParameters().isEmpty()){
-		for (Parameter par : constDec.getParameters()) {
-			parStruct.setParameterName(par.getId().getName());
-			parStruct.setParameterType(par.getType().toString());
+		if (constDec.getParameters() != null && !constDec.getParameters().isEmpty()) {
+			for (Parameter par : constDec.getParameters()) {
+				parStruct.setParameterName(par.getId().getName());
+				parStruct.setParameterType(par.getType().toString());
+			}
+			params.add(parStruct);
 		}
-		params.add(parStruct);
-		}
-		
 
 		constStruct.setConstParameters(params);
 
@@ -192,10 +209,10 @@ public class JavaParserUML {
 
 	}
 
-	public static RelationBean generateRelationships(String relType, String sourceClassName) {
+	public static RelationBean generateAssociation(String relType, String sourceClassName) {
 		RelationBean rel = new RelationBean();
 		if (relType.contains("Collection<")) {
-			String asso = Character.toString(relType.charAt(11));
+			String asso = relType.substring(relType.indexOf("<") + 1, relType.indexOf(">"));
 			System.out.println(asso);
 			rel.setAssociatedClass(asso);
 		} else {
@@ -212,7 +229,7 @@ public class JavaParserUML {
 		printLine.append("skinparam classAttributeIconSize 0\n");
 		for (ClassStructure classValues : parsedList) {
 			String className = classValues.getClassName();
-			System.out.println(className);
+		//	System.out.println(className);
 			if (classValues.isAnInterface()) {
 				printLine.append("interface " + className + " {\n");
 			} else {
@@ -262,8 +279,19 @@ public class JavaParserUML {
 					 * + methoDec.getMethodReturnType() + "\n"); } else
 					 */ if (methoDec.getMethodAccessModifier() == "public") {
 						printLine.append(
-								"+" + methoDec.getMethodName() + "() :" + methoDec.getMethodReturnType() + "\n");
+								"+" + methoDec.getMethodName() + "(");
+						if (methoDec.getMethodParameters()!=null && !methoDec.getMethodParameters().isEmpty()) {
+							for (int i = 0; i < methoDec.getMethodParameters().size(); i++) {
+								if (i == 0) {
+									printLine.append(methoDec.getMethodParameters().get(i).getParameterName() + " : "
+											+ methoDec.getMethodParameters().get(i).getParameterType());
+
+								}
+							}
+						}
+					 printLine.append(") : "+methoDec.getMethodReturnType() +" \n");
 					}
+					 
 				}
 			}
 			printLine.append("}\n");

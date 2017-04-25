@@ -1,9 +1,13 @@
 package com.parser.beans;
 
+import java.util.List;
+
 public class MethodStructure {
 	private String methodName;
 	private String methodAccessModifier;
 	private String methodReturnType;
+	private List<ParameterStructure>methodParameters;
+	
 
 	public String getMethodName() {
 		return methodName;
@@ -27,6 +31,20 @@ public class MethodStructure {
 
 	public void setMethodReturnType(String methodReturnType) {
 		this.methodReturnType = methodReturnType;
+	}
+
+	public List<ParameterStructure> getMethodParameters() {
+		return methodParameters;
+	}
+
+	public void setMethodParameters(List<ParameterStructure> methodParameters) {
+		this.methodParameters = methodParameters;
+	}
+
+	public String createDependecy(String sourceClass, String associatedClass) {
+		String str = sourceClass + "..>" + associatedClass;
+		return str;
+
 	}
 
 }

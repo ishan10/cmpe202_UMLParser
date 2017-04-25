@@ -59,7 +59,7 @@ public class AttributeStructure {
 		this.relationFlag = relationFlag;
 	}
 
-	public static String createAssociation(String sourceClass, String associatedClass) {
+	public String createAssociation(String sourceClass, String associatedClass) {
 		String str = sourceClass + "--" + associatedClass;
 		return str;
 
