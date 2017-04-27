@@ -129,6 +129,18 @@ public class GenerateUML {
 
 					}
 				}
+				if (classValues.getMethodList().get(0).getMethodBody() != null
+						&& !classValues.getMethodList().get(0).getMethodBody().isEmpty()) {
+					List<RelationBean> rels = classValues.getMethodList().get(0).getMethodBody();
+					for (RelationBean rb : rels) {
+						if (rb.getRelationType().equalsIgnoreCase("DEPENDENCY")) {
+							String parsedAssociation = classValues.getMethodList().get(0)
+									.createDependency(rb.getSourceClass(), rb.getAssociatedClass());
+							printLine.append(parsedAssociation + "\n");
+						}
+
+					}
+				}
 			}
 			
 			if (classValues.getConstructorList() != null && !classValues.getConstructorList().isEmpty()) {
@@ -145,6 +157,7 @@ public class GenerateUML {
 					}
 				}
 			}
+			
 		}
 
 		printLine.append("@enduml\n");

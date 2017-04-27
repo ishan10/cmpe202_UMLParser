@@ -7,6 +7,7 @@ public class MethodStructure {
 	private String methodAccessModifier;
 	private String methodReturnType;
 	private List<ParameterStructure>methodParameters;
+	private List<RelationBean>methodBody;
 	
 
 	public String getMethodName() {
@@ -45,6 +46,14 @@ public class MethodStructure {
 		String str = sourceClass + "..>" + associatedClass;
 		return str;
 
+	}
+
+	public List<RelationBean> getMethodBody() {
+		return methodBody;
+	}
+
+	public void setMethodBody(List<RelationBean> methodBody) {
+		this.methodBody = methodBody;
 	}
 
 }

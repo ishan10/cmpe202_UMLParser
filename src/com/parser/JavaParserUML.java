@@ -11,6 +11,7 @@ import com.parser.beans.ConstructorStructure;
 import com.parser.beans.MethodStructure;
 import com.parser.beans.ParameterStructure;
 import com.parser.beans.RelationBean;
+import com.sun.org.apache.bcel.internal.generic.ReferenceType;
 
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
@@ -23,6 +24,12 @@ import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.ModifierSet;
 import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
+import japa.parser.ast.expr.AssignExpr;
+import japa.parser.ast.expr.FieldAccessExpr;
+import japa.parser.ast.expr.VariableDeclarationExpr;
+import japa.parser.ast.stmt.BlockStmt;
+import japa.parser.ast.stmt.ExpressionStmt;
+import japa.parser.ast.stmt.Statement;
 
 public class JavaParserUML {
 
@@ -146,6 +153,7 @@ public class JavaParserUML {
 		MethodDeclaration methoDec = (MethodDeclaration) classAttribute;
 
 		List<ParameterStructure> methodParams = new ArrayList<ParameterStructure>();
+		List<RelationBean> methodBodyRel = new ArrayList<RelationBean>();
 
 		if (methoDec.getModifiers() == ModifierSet.PUBLIC) {
 			methodStruct.setMethodAccessModifier("public");
@@ -154,7 +162,24 @@ public class JavaParserUML {
 		}
 
 		methodStruct.setMethodName(methoDec.getName());
-
+		if(methoDec.getBody() !=null){
+			if(methoDec.getBody().getStmts()!=null && !methoDec.getBody().getStmts().isEmpty()){
+				for (Statement s : methoDec.getBody().getStmts()) {
+		            if (s instanceof ExpressionStmt) {
+		                ExpressionStmt est = (ExpressionStmt) s;
+		                if (est.getExpression() instanceof VariableDeclarationExpr) {
+		                	VariableDeclarationExpr ass = (VariableDeclarationExpr) est.getExpression();
+		                    if(!ass.getType().toString().equalsIgnoreCase("String")){
+		                    	System.out.println(ass.getType().toString());
+		                    	RelationBean dependency = generateDependecy(ass.getType().toString(), sourceClassName.getClassName());
+		                    	methodBodyRel.add(dependency);
+		                    }
+		                }
+		            }
+		        }	
+			}
+			methodStruct.setMethodBody(methodBodyRel);
+		}
 		if (methoDec.getParameters() != null && !methoDec.getParameters().isEmpty()) {
 			ParameterStructure parsedParameters = parseParameters(methoDec.getParameters(), sourceClassName);
 			methodParams.add(parsedParameters);
