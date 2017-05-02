@@ -11,7 +11,6 @@ import com.parser.beans.ConstructorStructure;
 import com.parser.beans.MethodStructure;
 import com.parser.beans.ParameterStructure;
 import com.parser.beans.RelationBean;
-import com.sun.org.apache.bcel.internal.generic.ReferenceType;
 
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
@@ -24,36 +23,42 @@ import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.ModifierSet;
 import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
-import japa.parser.ast.expr.AssignExpr;
-import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.VariableDeclarationExpr;
-import japa.parser.ast.stmt.BlockStmt;
 import japa.parser.ast.stmt.ExpressionStmt;
 import japa.parser.ast.stmt.Statement;
 
 public class JavaParserUML {
 
 	public static void main(String[] args) {
-		File[] input = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test5").listFiles();
-		try {
-			listClasses(input);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+		/*if (args.length == 0 || args.length < 2) {
+			System.out.println("Erro providing arguments : Terminating Program!");
+			System.exit(0);
+		} else {
+
+			String sourceFolder = args[0];
+			String outputFileName = args[1];
+*/
+			File[] input = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test3").listFiles();
+			try {
+				listClasses(input , "E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test3.png");
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-	}
+	//}
 
 	/*
-	 * Parses all the classes contained in the <INPUT> folder. 
-	 * Parses attributes, methods and constructors to generate relationships
-	 * within classes.
-	 * Returns the data structure to generate the UML Class Diagram
+	 * Parses all the classes contained in the <INPUT> folder. Parses
+	 * attributes, methods and constructors to generate relationships within
+	 * classes. Returns the data structure to generate the UML Class Diagram
 	 *
 	 */
-	public static void listClasses(File[] projectDir) throws ParseException, IOException {
+	public static void listClasses(File[] projectDir, String outputFileName) throws ParseException, IOException {
 
 		List<ClassStructure> parsedList = new ArrayList<ClassStructure>();
 
@@ -79,7 +84,7 @@ public class JavaParserUML {
 				}
 
 				List<BodyDeclaration> classMembers = type.getMembers();
-				
+
 				List<AttributeStructure> attributeStructure = parsedStructure.getAttributesList();
 				List<MethodStructure> methodStructure = parsedStructure.getMethodList();
 				List<ConstructorStructure> constStructure = parsedStructure.getConstructorList();
@@ -91,27 +96,27 @@ public class JavaParserUML {
 						AttributeStructure parsedAttrs = getClassAttributres(classAttribute, parsedStructure);
 						attributeStructure.add(parsedAttrs);
 					}
-					parsedStructure.setAttributesList(attributeStructure);
 
 					// Parse Class Methods
 					if (classAttribute instanceof MethodDeclaration) {
 						MethodStructure methodStruct = getClassMethods(classAttribute, parsedStructure);
 						methodStructure.add(methodStruct);
 					}
-					parsedStructure.setMethodList(methodStructure);
 
 					// Parse Class Constructors
 					if (classAttribute instanceof ConstructorDeclaration) {
 						ConstructorStructure constDetails = getClassConstrutors(classAttribute, parsedStructure);
 						constStructure.add(constDetails);
 					}
-					parsedStructure.setConstructorList(constStructure);
 				}
+				parsedStructure.setConstructorList(constStructure);
+				parsedStructure.setMethodList(methodStructure);
+				parsedStructure.setAttributesList(attributeStructure);
 				parsedList.add(parsedStructure);
 			}
 		}
-	
-		GenerateUML.generateUml(parsedList);
+
+		GenerateUML.generateUml(parsedList , outputFileName);
 
 	}
 
@@ -128,7 +133,10 @@ public class JavaParserUML {
 			attrs.setAttributeaccessModifier("public");
 		} else if (field.getModifiers() == ModifierSet.PRIVATE) {
 			attrs.setAttributeaccessModifier("private");
-		}
+		} /*
+			 * else if (field.getModifiers() == ModifierSet.PROTECTED) {
+			 * attrs.setAttributeaccessModifier("protected"); }
+			 */
 
 		String attrType = field.getType().toString();
 
@@ -162,21 +170,27 @@ public class JavaParserUML {
 		}
 
 		methodStruct.setMethodName(methoDec.getName());
-		if(methoDec.getBody() !=null){
-			if(methoDec.getBody().getStmts()!=null && !methoDec.getBody().getStmts().isEmpty()){
-				for (Statement s : methoDec.getBody().getStmts()) {
-		            if (s instanceof ExpressionStmt) {
-		                ExpressionStmt est = (ExpressionStmt) s;
-		                if (est.getExpression() instanceof VariableDeclarationExpr) {
-		                	VariableDeclarationExpr ass = (VariableDeclarationExpr) est.getExpression();
-		                    if(!ass.getType().toString().equalsIgnoreCase("String")){
-		                    	System.out.println(ass.getType().toString());
-		                    	RelationBean dependency = generateDependecy(ass.getType().toString(), sourceClassName.getClassName());
-		                    	methodBodyRel.add(dependency);
-		                    }
-		                }
-		            }
-		        }	
+
+		if (methoDec.getBody() != null) {
+
+			if (methoDec.getBody().getStmts() != null && !methoDec.getBody().getStmts().isEmpty()) {
+				for (Statement stmt : methoDec.getBody().getStmts()) {
+
+					if (stmt instanceof ExpressionStmt) {
+						ExpressionStmt exprStmt = (ExpressionStmt) stmt;
+
+						if (exprStmt.getExpression() instanceof VariableDeclarationExpr) {
+							VariableDeclarationExpr expr = (VariableDeclarationExpr) exprStmt.getExpression();
+
+							if (!expr.getType().toString().equalsIgnoreCase("String")) {
+								// System.out.println(expr.getType().toString());
+								RelationBean dependency = generateDependecy(expr.getType().toString(),
+										sourceClassName.getClassName());
+								methodBodyRel.add(dependency);
+							}
+						}
+					}
+				}
 			}
 			methodStruct.setMethodBody(methodBodyRel);
 		}

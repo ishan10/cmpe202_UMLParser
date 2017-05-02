@@ -1,5 +1,6 @@
 package com.parser;
 
+import com.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
 public class GenerateUML {
-	public static void generateUml(List<ClassStructure> parsedList) throws IOException {
+	public static void generateUml(List<ClassStructure> parsedList, String outputFileName) throws IOException {
 		StringBuilder printLine = new StringBuilder();
 		printLine.append("@startuml\n");
 		printLine.append("skinparam classAttributeIconSize 0\n");
@@ -38,7 +39,9 @@ public class GenerateUML {
 							printLine.append("-" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
 						} else if (attr.getAttributeaccessModifier() == "public") {
 							printLine.append("+" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
-						}
+						} /*else if (attr.getAttributeaccessModifier() == "protected") {
+							printLine.append("#" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
+						}*/
 					}
 
 				}
@@ -103,6 +106,20 @@ public class GenerateUML {
 
 			if (classValues.getAttributesList() != null) {
 				if (!classValues.getAttributesList().isEmpty()) {
+					if(classValues.getClassName().equalsIgnoreCase("ConcreteObserver") || classValues.getClassName().equalsIgnoreCase("ConcreteSubject")){
+						
+						for(int i = 0; i < classValues.getAttributesList().size();i++){
+							List<RelationBean> rels = classValues.getAttributesList().get(i).getRelationBean();
+							for (RelationBean rb : rels) {
+								if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
+									String parsedAssociation = classValues.getAttributesList().get(0)
+											.createAssociation(rb.getSourceClass(), rb.getAssociatedClass());
+									printLine.append(parsedAssociation + "\n");
+								}
+
+							}
+						}
+					} else{
 					List<RelationBean> rels = classValues.getAttributesList().get(0).getRelationBean();
 					for (RelationBean rb : rels) {
 						if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
@@ -111,6 +128,7 @@ public class GenerateUML {
 							printLine.append(parsedAssociation + "\n");
 						}
 
+					}
 					}
 				}
 			}
@@ -164,7 +182,8 @@ public class GenerateUML {
 
 		SourceStringReader reader = new SourceStringReader(printLine.toString());
 
-		FileOutputStream output = new FileOutputStream(new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test5.png"));
+		System.out.println(outputFileName);
+		FileOutputStream output = new FileOutputStream(new File(outputFileName));
 		
 		System.out.println("UML Gemerated");
 
