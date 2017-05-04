@@ -20,6 +20,8 @@ import net.sourceforge.plantuml.SourceStringReader;
 public class GenerateUML {
 	public static void generateUml(List<ClassStructure> parsedList, String outputFileName) throws IOException {
 		StringBuilder printLine = new StringBuilder();
+		
+		System.out.println("Generating Grammer...");
 		printLine.append("@startuml\n");
 		printLine.append("skinparam classAttributeIconSize 0\n");
 		for (ClassStructure classValues : parsedList) {
@@ -181,13 +183,13 @@ public class GenerateUML {
 		printLine.append("@enduml\n");
 
 		SourceStringReader reader = new SourceStringReader(printLine.toString());
-
-		System.out.println(outputFileName);
+		
+		System.out.println("Grammer generated.Now generating class diagram...");
+		
 		FileOutputStream output = new FileOutputStream(new File(outputFileName));
 		
-		System.out.println("UML Gemerated");
-
 		reader.generateImage(output, new FileFormatOption(FileFormat.PNG, false));
+		System.out.println("Class Diagram "+outputFileName+ " generated.");
 	}
 
 }

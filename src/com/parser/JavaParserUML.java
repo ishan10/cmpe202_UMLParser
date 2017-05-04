@@ -31,17 +31,17 @@ public class JavaParserUML {
 
 	public static void main(String[] args) {
 
-		/*if (args.length == 0 || args.length < 2) {
+		if (args.length == 0 || args.length < 2) {
 			System.out.println("Erro providing arguments : Terminating Program!");
 			System.exit(0);
 		} else {
 
-			String sourceFolder = args[0];
+			File sourceFolder = new File(args[0]);
 			String outputFileName = args[1];
-*/
-			File[] input = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test3").listFiles();
+
+			File[] input = sourceFolder.listFiles((File pathName) -> pathName.getName().endsWith(".java"));
 			try {
-				listClasses(input , "E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test3.png");
+				listClasses(input , outputFileName);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -50,7 +50,7 @@ public class JavaParserUML {
 				e.printStackTrace();
 			}
 		}
-	//}
+	}
 
 	/*
 	 * Parses all the classes contained in the <INPUT> folder. Parses
@@ -61,8 +61,9 @@ public class JavaParserUML {
 	public static void listClasses(File[] projectDir, String outputFileName) throws ParseException, IOException {
 
 		List<ClassStructure> parsedList = new ArrayList<ClassStructure>();
-
+		try{
 		for (File file : projectDir) {
+			
 			CompilationUnit cu = JavaParser.parse(file);
 
 			ClassStructure parsedStructure = new ClassStructure();
@@ -76,10 +77,12 @@ public class JavaParserUML {
 					if (className.isInterface()) {
 						parsedStructure.setClassName(className.getName());
 						parsedStructure.setAnInterface(true);
+						System.out.println("Parsing Interface : "+className.getName());
 					} else {
 						parsedStructure.setExtendsList(className.getExtends());
 						parsedStructure.setImplementsList(className.getImplements());
 						parsedStructure.setClassName(className.getName());
+						System.out.println("Parsing Class : "+className.getName());
 					}
 				}
 
@@ -114,6 +117,9 @@ public class JavaParserUML {
 				parsedStructure.setAttributesList(attributeStructure);
 				parsedList.add(parsedStructure);
 			}
+		}
+		} catch (Error e) {
+			// TODO: handle exception
 		}
 
 		GenerateUML.generateUml(parsedList , outputFileName);
@@ -258,7 +264,7 @@ public class JavaParserUML {
 
 		if (relType.contains("Collection<")) {
 			String asso = relType.substring(relType.indexOf("<") + 1, relType.indexOf(">"));
-			System.out.println(asso);
+			//System.out.println(asso);
 			rel.setAssociatedClass(asso);
 		} else {
 			rel.setAssociatedClass(relType);
