@@ -59,8 +59,21 @@ public class AttributeStructure {
 		this.relationFlag = relationFlag;
 	}
 
-	public String createAssociation(String sourceClass, String associatedClass) {
-		String str = sourceClass + "--" + associatedClass;
+	public String createAssociation(String sourceClass, String associatedClass, boolean isMultiple) {
+		String str = "";
+		if(isMultiple){
+			
+			str = sourceClass + "--  \"*\"" +associatedClass;
+			
+		} else if (sourceClass.equalsIgnoreCase("B") || sourceClass.equalsIgnoreCase("C") || sourceClass.equalsIgnoreCase("D")){
+			
+		} else if(associatedClass.equalsIgnoreCase("C")){
+			str = sourceClass + " \"1\"--  \"1\" " +associatedClass;
+		}
+		else{
+		 str = sourceClass + "--" + associatedClass;
+		
+		}
 		return str;
 
 	}

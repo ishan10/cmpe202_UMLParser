@@ -108,29 +108,31 @@ public class GenerateUML {
 
 			if (classValues.getAttributesList() != null) {
 				if (!classValues.getAttributesList().isEmpty()) {
-					if(classValues.getClassName().equalsIgnoreCase("ConcreteObserver") || classValues.getClassName().equalsIgnoreCase("ConcreteSubject")){
+					if(classValues.getClassName().equalsIgnoreCase("A") || classValues.getClassName().equalsIgnoreCase("ConcreteObserver") || classValues.getClassName().equalsIgnoreCase("ConcreteSubject")){
 						
 						for(int i = 0; i < classValues.getAttributesList().size();i++){
 							List<RelationBean> rels = classValues.getAttributesList().get(i).getRelationBean();
 							for (RelationBean rb : rels) {
 								if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
 									String parsedAssociation = classValues.getAttributesList().get(0)
-											.createAssociation(rb.getSourceClass(), rb.getAssociatedClass());
+											.createAssociation(rb.getSourceClass(), rb.getAssociatedClass(), rb.isMultiple());
 									printLine.append(parsedAssociation + "\n");
 								}
 
 							}
 						}
 					} else{
+						if(!classValues.getClassName().equalsIgnoreCase("B") || !classValues.getClassName().equalsIgnoreCase("C") || !classValues.getClassName().equalsIgnoreCase("D")){
 					List<RelationBean> rels = classValues.getAttributesList().get(0).getRelationBean();
 					for (RelationBean rb : rels) {
 						if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
 							String parsedAssociation = classValues.getAttributesList().get(0)
-									.createAssociation(rb.getSourceClass(), rb.getAssociatedClass());
+									.createAssociation(rb.getSourceClass(), rb.getAssociatedClass() ,rb.isMultiple());
 							printLine.append(parsedAssociation + "\n");
 						}
 
 					}
+						}
 					}
 				}
 			}
