@@ -25,25 +25,26 @@ import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.expr.VariableDeclarationExpr;
 import japa.parser.ast.stmt.ExpressionStmt;
+import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.Statement;
 
 public class JavaParserUML {
 
 	public static void main(String[] args) {
 
-		/*if (args.length == 0 || args.length < 2) {
+		if (args.length == 0 || args.length < 2) {
 			System.out.println("Erro providing arguments : Terminating Program!");
 			System.exit(0);
 		} else {
 
 			File sourceFolder = new File(args[0]);
-			String outputFileName = args[1];*/
+			String outputFileName = args[1];
 			
-		File sourceFolder = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test5");			
+		//File sourceFolder = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test4");			
 
 			File[] input = sourceFolder.listFiles((File pathName) -> pathName.getName().endsWith(".java"));
 			try {
-				listClasses(input , "E:/workspaces/CMPE202/cmpe202_UMLParser/src/com/parser/test5.png");
+				listClasses(input , outputFileName);
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -52,7 +53,7 @@ public class JavaParserUML {
 				e.printStackTrace();
 			}
 		}
-	//}
+	}
 
 	/*
 	 * Parses all the classes contained in the <INPUT> folder. Parses
@@ -197,6 +198,14 @@ public class JavaParserUML {
 								methodBodyRel.add(dependency);
 							}
 						}
+					}
+					
+					if (stmt instanceof ForeachStmt) {
+						ForeachStmt exprStmt = (ForeachStmt) stmt;
+
+						RelationBean dependency = generateDependecy(exprStmt.getVariable().getType().toString(),
+								sourceClassName.getClassName());
+						methodBodyRel.add(dependency);
 					}
 				}
 			}

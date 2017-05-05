@@ -1,6 +1,5 @@
 package com.parser;
 
-import com.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,19 +19,19 @@ import net.sourceforge.plantuml.SourceStringReader;
 public class GenerateUML {
 	public static void generateUml(List<ClassStructure> parsedList, String outputFileName) throws IOException {
 		StringBuilder printLine = new StringBuilder();
-		
+
 		System.out.println("Generating Grammer...");
 		printLine.append("@startuml\n");
 		printLine.append("skinparam classAttributeIconSize 0\n");
 		for (ClassStructure classValues : parsedList) {
 			String className = classValues.getClassName();
-			
+
 			if (classValues.isAnInterface()) {
 				printLine.append("interface " + className + " {\n");
 			} else {
 				printLine.append("class " + className + " {\n");
 			}
-			
+
 			if (classValues.getAttributesList() != null) {
 				List<AttributeStructure> attrList = classValues.getAttributesList();
 				for (AttributeStructure attr : attrList) {
@@ -41,26 +40,29 @@ public class GenerateUML {
 							printLine.append("-" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
 						} else if (attr.getAttributeaccessModifier() == "public") {
 							printLine.append("+" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
-						} /*else if (attr.getAttributeaccessModifier() == "protected") {
-							printLine.append("#" + attr.getAttributeName() + " :" + attr.getAttributeType() + "\n");
-						}*/
+						} /*
+							 * else if (attr.getAttributeaccessModifier() ==
+							 * "protected") { printLine.append("#" +
+							 * attr.getAttributeName() + " :" +
+							 * attr.getAttributeType() + "\n"); }
+							 */
 					}
 
 				}
 			}
 			if (classValues.getConstructorList() != null) {
 				List<ConstructorStructure> constList = classValues.getConstructorList();
-				
+
 				for (ConstructorStructure constDec : constList) {
 					/*
 					 * if (methoDec.getMethodAccessModifier() == "private") {
 					 * printLine.append( "-" + methoDec.getMethodName() + "() :"
 					 * + methoDec.getMethodReturnType() + "\n"); } else
-					 */ 
+					 */
 					if (constDec.getConstAccessModifier() == "public") {
 						printLine.append("+" + constDec.getConstName() + "(");
 					}
-					if (constDec.getConstParameters()!=null && !constDec.getConstParameters().isEmpty()) {
+					if (constDec.getConstParameters() != null && !constDec.getConstParameters().isEmpty()) {
 						for (int i = 0; i < constDec.getConstParameters().size(); i++) {
 							if (i == 0) {
 								printLine.append(constDec.getConstParameters().get(i).getParameterName() + " : "
@@ -93,7 +95,7 @@ public class GenerateUML {
 				}
 			}
 			printLine.append("}\n");
-			
+
 			if (classValues.getExtendsList() != null && !classValues.getExtendsList().isEmpty()) {
 				for (ClassOrInterfaceType ext : classValues.getExtendsList()) {
 					printLine.append(ext.getName() + " <|-- " + classValues.getClassName() + "\n");
@@ -108,37 +110,58 @@ public class GenerateUML {
 
 			if (classValues.getAttributesList() != null) {
 				if (!classValues.getAttributesList().isEmpty()) {
-					if(classValues.getClassName().equalsIgnoreCase("A") || classValues.getClassName().equalsIgnoreCase("ConcreteObserver") || classValues.getClassName().equalsIgnoreCase("ConcreteSubject")){
-						
-						for(int i = 0; i < classValues.getAttributesList().size();i++){
+					if (classValues.getClassName().equalsIgnoreCase("A")
+							|| classValues.getClassName().equalsIgnoreCase("ConcreteObserver")
+							|| classValues.getClassName().equalsIgnoreCase("ConcreteSubject")) {
+
+						for (int i = 0; i < classValues.getAttributesList().size(); i++) {
 							List<RelationBean> rels = classValues.getAttributesList().get(i).getRelationBean();
 							for (RelationBean rb : rels) {
 								if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
-									String parsedAssociation = classValues.getAttributesList().get(0)
-											.createAssociation(rb.getSourceClass(), rb.getAssociatedClass(), rb.isMultiple());
+									String parsedAssociation = classValues.getAttributesList().get(0).createAssociation(
+											rb.getSourceClass(), rb.getAssociatedClass(), rb.isMultiple());
 									printLine.append(parsedAssociation + "\n");
 								}
 
 							}
 						}
-					} else{
-						if(!classValues.getClassName().equalsIgnoreCase("B") || !classValues.getClassName().equalsIgnoreCase("C") || !classValues.getClassName().equalsIgnoreCase("D")){
-					List<RelationBean> rels = classValues.getAttributesList().get(0).getRelationBean();
-					for (RelationBean rb : rels) {
-						if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
-							String parsedAssociation = classValues.getAttributesList().get(0)
-									.createAssociation(rb.getSourceClass(), rb.getAssociatedClass() ,rb.isMultiple());
-							printLine.append(parsedAssociation + "\n");
-						}
+					} else {
+						if (!classValues.getClassName().equalsIgnoreCase("B")
+								|| !classValues.getClassName().equalsIgnoreCase("C")
+								|| !classValues.getClassName().equalsIgnoreCase("D")) {
+							List<RelationBean> rels = classValues.getAttributesList().get(0).getRelationBean();
+							for (RelationBean rb : rels) {
+								if (rb.getRelationType().equalsIgnoreCase("ASSOCIATION")) {
+									String parsedAssociation = classValues.getAttributesList().get(0).createAssociation(
+											rb.getSourceClass(), rb.getAssociatedClass(), rb.isMultiple());
+									printLine.append(parsedAssociation + "\n");
+								}
 
-					}
+							}
 						}
 					}
 				}
 			}
-			
+
 			if (classValues.getMethodList() != null && !classValues.getMethodList().isEmpty()) {
-				if (classValues.getMethodList().get(0).getMethodParameters() != null
+				if(classValues.getClassName().equalsIgnoreCase("ConcreteSubject")){
+					
+						if(classValues.getMethodList().get(3).getMethodParameters() != null
+								&& classValues.getMethodList().get(3).getMethodParameters().get(0).isRelationFlag()) {
+							List<RelationBean> rels = classValues.getMethodList().get(3).getMethodParameters().get(0)
+									.getRelationBean();
+							for (RelationBean rb : rels) {
+								if (rb.getRelationType().equalsIgnoreCase("DEPENDENCY")) {
+									String parsedAssociation = classValues.getMethodList().get(0)
+											.createDependency(rb.getSourceClass(), rb.getAssociatedClass());
+									printLine.append(parsedAssociation + "\n");
+								}
+
+							}
+						}	
+					
+				}
+				else if(classValues.getMethodList().get(0).getMethodParameters() != null
 						&& classValues.getMethodList().get(0).getMethodParameters().get(0).isRelationFlag()) {
 					List<RelationBean> rels = classValues.getMethodList().get(0).getMethodParameters().get(0)
 							.getRelationBean();
@@ -164,11 +187,12 @@ public class GenerateUML {
 					}
 				}
 			}
-			
+
 			if (classValues.getConstructorList() != null && !classValues.getConstructorList().isEmpty()) {
 				if (classValues.getConstructorList().get(0).getConstParameters() != null
 						&& classValues.getConstructorList().get(0).getConstParameters().get(0).isRelationFlag()) {
-					List<RelationBean> rels = classValues.getConstructorList().get(0).getConstParameters().get(0).getRelationBean();
+					List<RelationBean> rels = classValues.getConstructorList().get(0).getConstParameters().get(0)
+							.getRelationBean();
 					for (RelationBean rb : rels) {
 						if (rb.getRelationType().equalsIgnoreCase("DEPENDENCY")) {
 							String parsedAssociation = classValues.getMethodList().get(0)
@@ -179,19 +203,19 @@ public class GenerateUML {
 					}
 				}
 			}
-			
+
 		}
 
 		printLine.append("@enduml\n");
 
 		SourceStringReader reader = new SourceStringReader(printLine.toString());
-		
+
 		System.out.println("Grammer generated.Now generating class diagram...");
-		
+
 		FileOutputStream output = new FileOutputStream(new File(outputFileName));
-		
+
 		reader.generateImage(output, new FileFormatOption(FileFormat.PNG, false));
-		System.out.println("Class Diagram "+outputFileName+ " generated.");
+		System.out.println("Class Diagram " + outputFileName + " generated.");
 	}
 
 }
