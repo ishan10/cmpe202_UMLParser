@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.parser.beans.AttributeStructure;
 import com.parser.beans.ClassStructure;
 import com.parser.beans.ConstructorStructure;
@@ -39,8 +38,8 @@ public class JavaParserUML {
 
 			File sourceFolder = new File(args[0]);
 			String outputFileName = args[1];
-			
-		//File sourceFolder = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test4");			
+		
+		//File sourceFolder = new File("E:/workspaces/CMPE202/cmpe202_UMLParser/src/testClasses/test5");			
 
 			File[] input = sourceFolder.listFiles((File pathName) -> pathName.getName().endsWith(".java"));
 			try {
@@ -172,7 +171,7 @@ public class JavaParserUML {
 		List<ParameterStructure> methodParams = new ArrayList<ParameterStructure>();
 		List<RelationBean> methodBodyRel = new ArrayList<RelationBean>();
 
-		if (methoDec.getModifiers() == ModifierSet.PUBLIC) {
+		if (methoDec.getModifiers() == ModifierSet.PUBLIC || methoDec.getModifiers() == 1025) {
 			methodStruct.setMethodAccessModifier("public");
 		} else if (methoDec.getModifiers() == ModifierSet.PRIVATE) {
 			methodStruct.setMethodAccessModifier("private");

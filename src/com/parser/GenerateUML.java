@@ -27,7 +27,7 @@ public class GenerateUML {
 			String className = classValues.getClassName();
 
 			if (classValues.isAnInterface()) {
-				printLine.append("interface " + className + " {\n");
+				printLine.append("interface " + className + " <<interface>>{\n");
 			} else {
 				printLine.append("class " + className + " {\n");
 			}
@@ -205,7 +205,7 @@ public class GenerateUML {
 			}
 
 		}
-
+		printLine.append("hide circle\n");
 		printLine.append("@enduml\n");
 
 		SourceStringReader reader = new SourceStringReader(printLine.toString());
